@@ -5,17 +5,48 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Hellang.Middleware.ProblemDetails;
+using Infrastructure.Exceptions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
+using FluentValidation;
+using System.Data.Common;
 
-namespace Infrastructure
+namespace Infrastructure.Extensions
 {
     public static class ServiceExtensions
     {
+        public static void AddExceptionHandling(this IServiceCollection services, IWebHostEnvironment environment)
+        {
+            services.AddProblemDetails(options =>
+            {
+                options.ExceptionDetailsPropertyName = "Exception details";
+                options.IncludeExceptionDetails = (context, exception) => environment.IsDevelopment() || environment.IsStaging();
+
+                options.Map<BadRequestException>(exception => new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = exception.Detail,
+                    Title = exception.Title,
+                    Type = exception.Type
+                });
+
+                options.Map<ValidationException>(exception => new ProblemDetails 
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = exception.Message
+                });
+
+                options.Map<DbException>(exception => new ProblemDetails
+                {
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            });
+        }
+
         public static void ConfigureIdentity(this IServiceCollection services)
         {
             var builder = services.AddIdentityCore<User>(o =>
@@ -44,7 +75,8 @@ namespace Infrastructure
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
             var secretKey = Environment.GetEnvironmentVariable("JWT_KEY");
-            services.AddAuthentication(opt => {
+            services.AddAuthentication(opt =>
+            {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
@@ -58,7 +90,8 @@ namespace Infrastructure
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtSettings.GetSection("validIssuer").Value,
                     ValidAudience = jwtSettings.GetSection("validAudience").Value,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                    ClockSkew = TimeSpan.FromSeconds(5)
                 };
 
                 options.Events = new JwtBearerEvents

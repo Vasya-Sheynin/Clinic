@@ -1,5 +1,9 @@
 using Auth.Defaults;
-using Infrastructure;
+using Hellang.Middleware.ProblemDetails;
+using Infrastructure.AuthManager;
+using Infrastructure.Exceptions;
+using Infrastructure.Extensions;
+using Infrastructure.SessionStorageManager;
 using Microsoft.AspNetCore.Identity;
 using Users;
 
@@ -29,6 +33,10 @@ namespace Auth
             builder.Services.ConfigureJWT(builder.Configuration);
 
             builder.Services.AddTransient<IAuthenticationManager, AuthenticationManager>();
+            builder.Services.AddSingleton<ISessionStorageManager, SessionStorageManager>();
+
+            builder.Services.AddExceptionHandling(builder.Environment);
+
 
             var app = builder.Build();
 
@@ -40,6 +48,8 @@ namespace Auth
 
                 app.ApplyMigration();
             }
+
+            app.UseProblemDetails();
 
             app.UseHttpsRedirection();
 

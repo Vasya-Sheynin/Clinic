@@ -1,18 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Application.Dto;
+using Infrastructure.AuthManager;
+using Infrastructure.SessionStorageManager;
 
 namespace Auth.Controllers
 {
-    [Route("api/auth")]
+    [Route("auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
         private readonly IAuthenticationManager _authManager;
-        public AuthController(IAuthenticationManager authManager)
+        private readonly ISessionStorageManager _sessionStorageManager;
+
+        public AuthController(IAuthenticationManager authManager, ISessionStorageManager sessionStorageManager)
         {
             _authManager = authManager;
+            _sessionStorageManager = sessionStorageManager;
         }
 
         [AllowAnonymous]
@@ -21,8 +25,8 @@ namespace Auth.Controllers
         {
             var tokens = await _authManager.HandleRegisterAsync(registerDto);
 
-            SetAccessTokenCookie(tokens.Value.AccessToken);
-            SetRefreshTokenCookie(tokens.Value.RefreshToken);
+            _sessionStorageManager.SetAccessTokenCookie(Response, tokens.AccessToken);
+            _sessionStorageManager.SetRefreshTokenCookie(Response, tokens.RefreshToken);
 
             return Ok();
         }
@@ -31,18 +35,12 @@ namespace Auth.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginDto loginDto)
         {
-            var tokens = await _authManager.HandleLoginAsync(loginDto);
-        
-            if (tokens != null)
-            {
-                SetAccessTokenCookie(tokens.Value.AccessToken);
-                SetRefreshTokenCookie(tokens.Value.RefreshToken);
-                return Ok();
-            }
-            else
-            {
-                return BadRequest();
-            }
+            var tokens = await _authManager.HandleLoginAsync(loginDto);    
+            
+            _sessionStorageManager.SetAccessTokenCookie(Response, tokens.AccessToken);
+            _sessionStorageManager.SetRefreshTokenCookie(Response, tokens.RefreshToken);
+
+            return Ok();
         }
 
         [Authorize]
@@ -51,46 +49,25 @@ namespace Auth.Controllers
         {
             var userName = HttpContext.User.Identity?.Name;
             await _authManager.HandleLogoutAsync(userName);
+            
+            _sessionStorageManager.DeleteCookie(Response, "AccessToken");
+            _sessionStorageManager.DeleteCookie(Response, "RefreshToken");
 
-            Response.Cookies.Delete("AccessToken");
-            Response.Cookies.Delete("RefreshToken");
             return Ok();
         }
 
         [AllowAnonymous]
         [HttpPost("refresh")]
-        public async Task<ActionResult> Refresh([FromBody]RefreshDto refreshDto)
+        public async Task<ActionResult> Refresh()
         {
-            var tokens = await _authManager.HandleRefreshAsync(refreshDto);
+            var accessToken = _sessionStorageManager.GetAccessToken(Request);
+            var refreshToken = _sessionStorageManager.GetRefreshToken(Request);
+            var newTokens = await _authManager.HandleRefreshAsync(new RefreshDto(accessToken, refreshToken));
 
-            SetAccessTokenCookie(tokens.Value.AccessToken);
-            SetRefreshTokenCookie(tokens.Value.RefreshToken);
+            _sessionStorageManager.SetAccessTokenCookie(Response, newTokens.AccessToken);
+            _sessionStorageManager.SetRefreshTokenCookie(Response, newTokens.RefreshToken);
 
             return Ok();
-        }
-
-        private void SetAccessTokenCookie(string token)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                Expires = DateTime.Now.AddHours(1),
-                Secure = true,
-                HttpOnly = true,
-            };
-
-            Response.Cookies.Append("AccessToken", token, cookieOptions);
-        }
-
-        private void SetRefreshTokenCookie(string token)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                Expires = DateTime.Now.AddDays(1),
-                Secure = true,
-                HttpOnly = true,
-            };
-
-            Response.Cookies.Append("RefreshToken", token, cookieOptions);
         }
     }
 }

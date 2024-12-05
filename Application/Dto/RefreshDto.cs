@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Application.Dto
 {
     public record RefreshDto(
-        [Required] string RefreshToken, 
-        [Required] string AccessToken
+        string? AccessToken,
+        string? RefreshToken
     );
 }

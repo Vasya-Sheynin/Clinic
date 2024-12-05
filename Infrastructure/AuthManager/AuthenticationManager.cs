@@ -3,51 +3,57 @@ using Application.Dto;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using System.Security.Cryptography;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Infrastructure.Exceptions;
+using Application.Validation;
+using FluentValidation;
 
-namespace Infrastructure
+namespace Infrastructure.AuthManager
 {
     public class AuthenticationManager : IAuthenticationManager
     {
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly double _refreshTokenLifetime;
+        private readonly double _accessTokenLifetime;
 
         public AuthenticationManager(UserManager<User> accountManager, IConfiguration configuration)
         {
             _userManager = accountManager;
             _configuration = configuration;
+
+            _refreshTokenLifetime = Convert.ToDouble(
+                _configuration.GetSection("RefreshSettings").GetSection("expires").Value);
+            _accessTokenLifetime = Convert.ToDouble(
+                _configuration.GetSection("JwtSettings").GetSection("expires").Value);
         }
 
-        public async Task<(string AccessToken, string RefreshToken)?> HandleLoginAsync(LoginDto loginDto)
+        public async Task<(string AccessToken, string RefreshToken)> HandleLoginAsync(LoginDto loginDto)
         {
             var user = await _userManager.FindByNameAsync(loginDto.UserName);
-            if (user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
+            if (user == null || !await _userManager.CheckPasswordAsync(user, loginDto.Password))
             {
-                var accessToken = await CreateAccessToken(user);
-                var refreshToken = CreateRefreshToken();
-
-                user.RefreshToken = refreshToken;
-                user.RefreshTokenExpiry = DateTime.UtcNow.AddMinutes(1);
-                await _userManager.UpdateAsync(user);
-
-                return (AccessToken: accessToken, RefreshToken: refreshToken);
+                throw new LoginException();
             }
-            else
-            {
-                return null;
-            }
+
+            var accessToken = await CreateAccessToken(user);
+            var refreshToken = CreateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(_refreshTokenLifetime);
+            await _userManager.UpdateAsync(user);
+
+            return (AccessToken: accessToken, RefreshToken: refreshToken);
         }
 
-        public async Task<(string AccessToken, string RefreshToken)?> HandleRegisterAsync(RegisterDto registerDto)
+        public async Task<(string AccessToken, string RefreshToken)> HandleRegisterAsync(RegisterDto registerDto)
         {
+            var validator = new RegisterDtoValidator();
+            await validator.ValidateAndThrowAsync(registerDto);
+
             var user = new User
             {
                 CreatedAt = DateTime.UtcNow,
@@ -55,9 +61,6 @@ namespace Infrastructure
                 Email = registerDto.Email,
                 PhoneNumber = registerDto.PhoneNumber
             };
-
-            await _userManager.AddToRoleAsync(user, "Patient");
-
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (!result.Succeeded)
@@ -67,47 +70,53 @@ namespace Infrastructure
                 {
                     exceptionMessage.AppendLine($"{error.Code}, {error.Description}");
                 }
-                throw new Exception(exceptionMessage.ToString());
+                throw new RegisterException(exceptionMessage.ToString());
             }
+
+
+            await _userManager.AddToRoleAsync(user, "Patient");
 
             var accessToken = await CreateAccessToken(user);
             var refreshToken = CreateRefreshToken();
 
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiry = DateTime.UtcNow.AddMinutes(1);
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(_refreshTokenLifetime);
 
             await _userManager.UpdateAsync(user);
 
             return (AccessToken: accessToken, RefreshToken: refreshToken);
         }
 
-        public async Task<(string AccessToken, string RefreshToken)?> HandleRefreshAsync(RefreshDto refreshDto)
+        public async Task<(string AccessToken, string RefreshToken)> HandleRefreshAsync(RefreshDto refreshDto)
         {
-            var principal = GetClaimsPrincipal(refreshDto.AccessToken);
+            var accessToken = refreshDto.AccessToken;
+            var refreshToken = refreshDto.RefreshToken;
 
-            var userName = principal?.Identity?.Name;
-
-            if (userName == null)
+            if (accessToken == null || refreshToken == null)
             {
-                return null;
+                throw new InvalidTokenException();
             }
+
+            var principal = GetClaimsPrincipal(accessToken);
+
+            var userName = principal.Identity.Name;
 
             var user = await _userManager.FindByNameAsync(userName);
 
-            if (user == null || user.RefreshToken !=  refreshDto.RefreshToken || user.RefreshTokenExpiry < DateTime.UtcNow)
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiry < DateTime.UtcNow)
             {
-                return null;
+                throw new InvalidTokenException();
             }
 
-            var accessToken = await CreateAccessToken(user);
-            var refreshToken = CreateRefreshToken();
+            var newAccessToken = await CreateAccessToken(user);
+            var newRefreshToken = CreateRefreshToken();
 
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiry = DateTime.UtcNow.AddMinutes(1);
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(_refreshTokenLifetime);
 
             await _userManager.UpdateAsync(user);
 
-            return (AccessToken: accessToken, RefreshToken: refreshToken);
+            return (AccessToken: newAccessToken, RefreshToken: newRefreshToken);
         }
 
         public async Task HandleLogoutAsync(string userName)
@@ -116,6 +125,7 @@ namespace Infrastructure
             if (user != null)
             {
                 user.RefreshToken = null;
+                user.RefreshTokenExpiry = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified);
                 await _userManager.UpdateAsync(user);
             }
         }
@@ -169,14 +179,14 @@ namespace Infrastructure
                 issuer: jwtSettings.GetSection("validIssuer").Value,
                 audience: jwtSettings.GetSection("validAudience").Value,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings.GetSection("expires").Value)),
+                expires: DateTime.Now.AddMinutes(_accessTokenLifetime),
                 signingCredentials: signingCredentials
             );
 
             return tokenOptions;
         }
 
-        private ClaimsPrincipal? GetClaimsPrincipal(string token)
+        private ClaimsPrincipal GetClaimsPrincipal(string token)
         {
             var jwtSettings = _configuration.GetSection("JwtSettings");
             var secretKey = Environment.GetEnvironmentVariable("JWT_KEY");

@@ -6,7 +6,7 @@ namespace Users
 {
     public class User : IdentityUser
     {
-        public int PhotoId { get; set; }
+        public Guid PhotoId { get; set; }
 
         [Required]
         public DateTime CreatedAt { get; set; }
