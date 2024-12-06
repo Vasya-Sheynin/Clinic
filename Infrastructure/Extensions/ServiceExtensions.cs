@@ -8,101 +8,104 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Hellang.Middleware.ProblemDetails;
-using Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using FluentValidation;
 using System.Data.Common;
+using Infrastructure.AuthService.Exceptions;
+using Infrastructure.AuthService.TokenOptions;
 
-namespace Infrastructure.Extensions
+namespace Infrastructure.Extensions;
+
+public static class ServiceExtensions
 {
-    public static class ServiceExtensions
+    public static void AddExceptionHandling(this IServiceCollection services, IWebHostEnvironment environment)
     {
-        public static void AddExceptionHandling(this IServiceCollection services, IWebHostEnvironment environment)
+        services.AddProblemDetails(options =>
         {
-            services.AddProblemDetails(options =>
+            options.ExceptionDetailsPropertyName = "Exception details";
+            options.IncludeExceptionDetails = (context, exception) => environment.IsDevelopment() || environment.IsStaging();
+
+            options.Map<BadRequestException>(exception => new ProblemDetails
             {
-                options.ExceptionDetailsPropertyName = "Exception details";
-                options.IncludeExceptionDetails = (context, exception) => environment.IsDevelopment() || environment.IsStaging();
-
-                options.Map<BadRequestException>(exception => new ProblemDetails
-                {
-                    Status = StatusCodes.Status400BadRequest,
-                    Detail = exception.Detail,
-                    Title = exception.Title,
-                    Type = exception.Type
-                });
-
-                options.Map<ValidationException>(exception => new ProblemDetails 
-                {
-                    Status = StatusCodes.Status400BadRequest,
-                    Detail = exception.Message
-                });
-
-                options.Map<DbException>(exception => new ProblemDetails
-                {
-                    Status = StatusCodes.Status500InternalServerError
-                });
+                Status = StatusCodes.Status400BadRequest,
+                Detail = exception.Detail,
+                Title = exception.Title,
+                Type = exception.Type
             });
-        }
 
-        public static void ConfigureIdentity(this IServiceCollection services)
+            options.Map<ValidationException>(exception => new ProblemDetails 
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Detail = exception.Message
+            });
+
+            options.Map<DbException>(exception => new ProblemDetails
+            {
+                Status = StatusCodes.Status500InternalServerError
+            });
+        });
+    }
+
+    public static void ConfigureIdentity(this IServiceCollection services)
+    {
+        var builder = services.AddIdentityCore<User>(o =>
         {
-            var builder = services.AddIdentityCore<User>(o =>
-            {
-                o.Password.RequireDigit = true;
-                o.Password.RequireLowercase = false;
-                o.Password.RequireUppercase = false;
-                o.Password.RequireNonAlphanumeric = false;
-                o.Password.RequiredLength = 4;
-                o.User.RequireUniqueEmail = true;
-            });
-            builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
-            builder.AddEntityFrameworkStores<UsersDbContext>();
-        }
+            o.Password.RequireDigit = true;
+            o.Password.RequireLowercase = false;
+            o.Password.RequireUppercase = false;
+            o.Password.RequireNonAlphanumeric = false;
+            o.Password.RequiredLength = 4;
+            o.User.RequireUniqueEmail = true;
+        });
+        builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
+        builder.AddEntityFrameworkStores<UsersDbContext>();
+    }
 
-        public static void ConfigurePersistence(this IServiceCollection services, IConfiguration config)
+    public static void ConfigurePersistence(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddDbContext<UsersDbContext>(options =>
         {
-            services.AddDbContext<UsersDbContext>(options =>
-            {
-                var connectionString = config.GetConnectionString("DbConnection");
-                options.UseSqlServer(connectionString);
-            });
-        }
+            var connectionString = config.GetConnectionString("DbConnection");
+            options.UseSqlServer(connectionString);
+        });
+    }
 
-        public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
+    public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
+    {
+        var jwtSettings = configuration.GetSection("JwtSettings");
+        var secretKey = Environment.GetEnvironmentVariable("JWT_KEY");
+        services.AddAuthentication(opt =>
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
-            var secretKey = Environment.GetEnvironmentVariable("JWT_KEY");
-            services.AddAuthentication(opt =>
+            opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
             {
-                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings.GetSection("validIssuer").Value,
-                    ValidAudience = jwtSettings.GetSection("validAudience").Value,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-                    ClockSkew = TimeSpan.FromSeconds(5)
-                };
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings.GetSection("validIssuer").Value,
+                ValidAudience = jwtSettings.GetSection("validAudience").Value,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                ClockSkew = TimeSpan.FromSeconds(5)
+            };
 
-                options.Events = new JwtBearerEvents
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
                 {
-                    OnMessageReceived = context =>
-                    {
-                        context.Token = context.Request.Cookies["AccessToken"];
-                        return Task.CompletedTask;
-                    }
-                };
-            });
-        }
+                    context.Token = context.Request.Cookies["AccessToken"];
+                    return Task.CompletedTask;
+                }
+            };
+        });
+
+        services.Configure<AccessTokenOptions>(configuration.GetSection("JwtSettings"));
+        services.Configure<RefreshTokenOptions>(configuration.GetSection("RefreshSettings"));
     }
 }

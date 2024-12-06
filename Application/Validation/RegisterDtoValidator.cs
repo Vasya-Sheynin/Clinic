@@ -6,16 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Validation
+namespace Application.Validation;
+
+public class RegisterDtoValidator : AbstractValidator<RegisterDto>
 {
-    public class RegisterDtoValidator : AbstractValidator<RegisterDto>
+    public RegisterDtoValidator()
     {
-        public RegisterDtoValidator()
-        {
-            RuleFor(dto => dto.PhoneNumber)
-                .NotEmpty()
-                .Matches(@"^\+?\d+$")
-                .WithMessage("Invalid Phone Number");
-        }
+        RuleFor(dto => dto.PhoneNumber)
+            .NotEmpty()
+            .Matches(@"^\+?\d+$")
+            .WithMessage("Invalid Phone Number");
     }
 }
