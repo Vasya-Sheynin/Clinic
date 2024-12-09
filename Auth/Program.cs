@@ -4,9 +4,11 @@ using Auth.Defaults;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
 using Infrastructure.AuthService;
+using Infrastructure.AuthService.TokenOptions;
+using Infrastructure.EmailService;
 using Infrastructure.Extensions;
-using Infrastructure.SessionStorageService;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Users;
 
 namespace Auth;
@@ -36,10 +38,11 @@ public class Program
 
         builder.Services.AddScoped<IValidator<RegisterDto>, RegisterDtoValidator>();
         builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
-        builder.Services.AddSingleton<ISessionStorageService, SessionStorageService>();
+        builder.Services.AddScoped<IEmailService, EmailService>();
+
+        builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailConfiguration"));
 
         builder.Services.AddExceptionHandling(builder.Environment);
-
 
         var app = builder.Build();
 

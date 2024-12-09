@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Application.Dto;
 using Infrastructure.AuthService;
-using Infrastructure.SessionStorageService;
 
 namespace Auth.Controllers;
 
@@ -11,12 +10,10 @@ namespace Auth.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthenticationService _authService;
-    private readonly ISessionStorageService _sessionStorageService;
 
-    public AuthController(IAuthenticationService authManager, ISessionStorageService sessionStorageManager)
+    public AuthController(IAuthenticationService authManager)
     {
         _authService = authManager;
-        _sessionStorageService = sessionStorageManager;
     }
 
     [AllowAnonymous]
@@ -25,10 +22,7 @@ public class AuthController : ControllerBase
     {
         var tokens = await _authService.HandleRegisterAsync(registerDto);
 
-        _sessionStorageService.SetAccessTokenCookie(Response, tokens.AccessToken);
-        _sessionStorageService.SetRefreshTokenCookie(Response, tokens.RefreshToken);
-
-        return Ok();
+        return Ok(tokens);
     }
 
     [AllowAnonymous]
@@ -36,37 +30,25 @@ public class AuthController : ControllerBase
     public async Task<ActionResult> Login([FromBody] LoginDto loginDto)
     {
         var tokens = await _authService.HandleLoginAsync(loginDto);    
-        
-        _sessionStorageService.SetAccessTokenCookie(Response, tokens.AccessToken);
-        _sessionStorageService.SetRefreshTokenCookie(Response, tokens.RefreshToken);
 
-        return Ok();
+        return Ok(tokens);
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpPost("logout")]
-    public async Task<ActionResult> Logout()
+    public async Task<ActionResult> Logout([FromBody] LogoutDto logoutDto)
     {
-        var userName = HttpContext.User.Identity?.Name;
-        await _authService.HandleLogoutAsync(userName);
-        
-        _sessionStorageService.DeleteCookie(Response, "AccessToken");
-        _sessionStorageService.DeleteCookie(Response, "RefreshToken");
+        await _authService.HandleLogoutAsync(logoutDto);
 
         return Ok();
     }
 
     [AllowAnonymous]
     [HttpPost("refresh")]
-    public async Task<ActionResult> Refresh()
+    public async Task<ActionResult> Refresh([FromBody] RefreshDto tokensToRefresh)
     {
-        var accessToken = _sessionStorageService.GetAccessToken(Request);
-        var refreshToken = _sessionStorageService.GetRefreshToken(Request);
-        var newTokens = await _authService.HandleRefreshAsync(new RefreshDto(accessToken, refreshToken));
+        var newTokens = await _authService.HandleRefreshAsync(tokensToRefresh);
 
-        _sessionStorageService.SetAccessTokenCookie(Response, newTokens.AccessToken);
-        _sessionStorageService.SetRefreshTokenCookie(Response, newTokens.RefreshToken);
-
-        return Ok();
+        return Ok(newTokens);
     }
 }

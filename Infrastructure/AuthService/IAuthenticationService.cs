@@ -7,5 +7,5 @@ public interface IAuthenticationService
     Task<TokensModel> HandleLoginAsync(LoginDto loginDto);
     Task<TokensModel> HandleRegisterAsync(RegisterDto registerDto);
     Task<TokensModel> HandleRefreshAsync(RefreshDto refreshDto);
-    Task HandleLogoutAsync(string userName);
+    Task HandleLogoutAsync(LogoutDto logoutDto);
 }

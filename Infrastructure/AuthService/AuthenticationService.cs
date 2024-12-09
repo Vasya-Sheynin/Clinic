@@ -10,23 +10,27 @@ using FluentValidation;
 using Infrastructure.AuthService.Exceptions;
 using Microsoft.Extensions.Options;
 using Infrastructure.AuthService.TokenOptions;
+using Infrastructure.EmailService;
 
 namespace Infrastructure.AuthService;
 
 public class AuthenticationService : IAuthenticationService
 {
     private readonly UserManager<User> _userManager;
+    private readonly IEmailService _emailService;
     private readonly IValidator<RegisterDto> _registerValidator;
     private readonly IOptions<AccessTokenOptions> _accessTokenOptions;
     private readonly IOptions<RefreshTokenOptions> _refreshTokenOptions;
 
     public AuthenticationService(
         UserManager<User> accountManager, 
+        IEmailService emailService,
         IValidator<RegisterDto> registerValidator,
         IOptions<AccessTokenOptions> accessTokenOptions, 
         IOptions<RefreshTokenOptions> refreshTokenOptions)
     {
         _userManager = accountManager;
+        _emailService = emailService;
         _registerValidator = registerValidator;
         _accessTokenOptions = accessTokenOptions;
         _refreshTokenOptions = refreshTokenOptions;
@@ -84,6 +88,9 @@ public class AuthenticationService : IAuthenticationService
 
         await _userManager.UpdateAsync(user);
 
+        var message = new Message(user.Email, "Welcome Letter", "You have registered successfully!");
+        await _emailService.SendEmail(message);
+
         return new TokensModel { AccessToken = accessToken, RefreshToken = refreshToken };
     }
 
@@ -119,8 +126,9 @@ public class AuthenticationService : IAuthenticationService
         return new TokensModel { AccessToken = newAccessToken, RefreshToken = newRefreshToken };
     }
 
-    public async Task HandleLogoutAsync(string userName)
+    public async Task HandleLogoutAsync(LogoutDto logoutDto)
     {
+        var userName = logoutDto.UserName;
         var user = await _userManager.FindByNameAsync(userName);
         if (user != null)
         {
