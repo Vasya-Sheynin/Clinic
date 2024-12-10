@@ -126,15 +126,6 @@ public static class ServiceExtensions
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
                 ClockSkew = TimeSpan.FromSeconds(5)
             };
-
-            options.Events = new JwtBearerEvents
-            {
-                OnMessageReceived = context =>
-                {
-                    context.Token = context.Request.Cookies["AccessToken"];
-                    return Task.CompletedTask;
-                }
-            };
         });
 
         services.Configure<AccessTokenOptions>(configuration.GetSection("JwtSettings"));
