@@ -89,7 +89,7 @@ public class AuthenticationService : IAuthenticationService
         await _userManager.UpdateAsync(user);
 
         var message = new Message(user.Email, "Welcome Letter", "You have registered successfully!");
-        await _emailService.SendEmail(message);
+        //await _emailService.SendEmail(message);
 
         return new TokensModel { AccessToken = accessToken, RefreshToken = refreshToken };
     }
@@ -126,9 +126,8 @@ public class AuthenticationService : IAuthenticationService
         return new TokensModel { AccessToken = newAccessToken, RefreshToken = newRefreshToken };
     }
 
-    public async Task HandleLogoutAsync(LogoutDto logoutDto)
+    public async Task HandleLogoutAsync(string userName)
     {
-        var userName = logoutDto.UserName;
         var user = await _userManager.FindByNameAsync(userName);
         if (user != null)
         {

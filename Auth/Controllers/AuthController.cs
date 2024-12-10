@@ -34,11 +34,12 @@ public class AuthController : ControllerBase
         return Ok(tokens);
     }
 
-    [AllowAnonymous]
+    [Authorize]
     [HttpPost("logout")]
-    public async Task<ActionResult> Logout([FromBody] LogoutDto logoutDto)
+    public async Task<ActionResult> Logout()
     {
-        await _authService.HandleLogoutAsync(logoutDto);
+        var userName = HttpContext.User.Identity?.Name;
+        await _authService.HandleLogoutAsync(userName);
 
         return Ok();
     }

@@ -24,7 +24,7 @@ public class Program
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.ConfigureSwagger();
 
         builder.Services.AddAuthentication();
         builder.Services.AddAuthorization();
