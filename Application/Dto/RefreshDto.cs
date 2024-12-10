@@ -5,10 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Dto
-{
-    public record RefreshDto(
-        [Required] string RefreshToken, 
-        [Required] string AccessToken
-    );
-}
+namespace Application.Dto;
+
+public record RefreshDto(
+    string? AccessToken,
+    string? RefreshToken
+);

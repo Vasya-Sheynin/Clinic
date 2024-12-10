@@ -12,8 +12,8 @@ using Users;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(UsersDbContext))]
-    [Migration("20241201105546_AddRefreshToken")]
-    partial class AddRefreshToken
+    [Migration("20241205082731_UpdateUser")]
+    partial class UpdateUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -203,8 +203,8 @@ namespace Persistence.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("PhotoId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("PhotoId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("RefreshToken")
                         .HasColumnType("nvarchar(max)");

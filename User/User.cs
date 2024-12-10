@@ -2,17 +2,16 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Users
+namespace Users;
+
+public class User : IdentityUser
 {
-    public class User : IdentityUser
-    {
-        public int PhotoId { get; set; }
+    public Guid PhotoId { get; set; }
 
-        [Required]
-        public DateTime CreatedAt { get; set; }
+    [Required]
+    public DateTime CreatedAt { get; set; }
 
-        public string? RefreshToken { get; set; }
+    public string? RefreshToken { get; set; }
 
-        public DateTime RefreshTokenExpiry { get; set; }
-    }
+    public DateTime RefreshTokenExpiry { get; set; }
 }
