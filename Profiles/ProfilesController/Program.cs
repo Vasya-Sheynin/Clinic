@@ -1,4 +1,8 @@
+using Application.Mapping;
+using Application.Queries;
+using Microsoft.Extensions.DependencyInjection;
 using Persistence;
+using System.Reflection;
 
 namespace ProfilesController
 {
@@ -17,7 +21,11 @@ namespace ProfilesController
 
             builder.Services.ConfigurePersistence(builder.Configuration);
             builder.Services.ConfigureRepoInterfaceProviders();
-            
+
+            builder.Services.AddMediatR(opt => opt.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(GetDoctorProfilesQuery))));
+
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
