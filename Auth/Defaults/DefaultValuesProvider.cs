@@ -16,7 +16,7 @@ public static class DefaultValuesProvider
         using (var scope = app.Services.CreateScope())
         {
             var rolesManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var roles = new string[] { "Admin", "Doctor", "Patient" };
+            var roles = new string[] { "Admin", "Receptionist", "Doctor", "Patient" };
 
             foreach (var role in roles)
             {

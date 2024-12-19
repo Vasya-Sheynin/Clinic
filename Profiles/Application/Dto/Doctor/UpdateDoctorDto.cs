@@ -1,14 +1,16 @@
-﻿namespace Application.Dto.Doctor;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Application.Dto.Doctor;
 
 public record UpdateDoctorDto
 {
-    public Guid AccountId { get; set; }
-    public Guid SpecializationId { get; set; }
-    public Guid OfficeId { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    [Required] public Guid AccountId { get; set; }
+    [Required] public Guid SpecializationId { get; set; }
+    [Required] public Guid OfficeId { get; set; }
+    [Required] public string FirstName { get; set; }
+    [Required] public string LastName { get; set; }
     public string MiddleName { get; set; }
-    public string Status { get; set; }
-    public DateTime DateOfBirth { get; set; }
-    public DateTime CareerStartDate { get; set; }
+    [Required] public string Status { get; set; }
+    [Required] public DateTime DateOfBirth { get; set; }
+    [Required] public DateTime CareerStartDate { get; set; }
 }

@@ -1,18 +1,18 @@
-﻿using Application.Commands;
+﻿using Application.Commands.DoctorCommands;
 using Application.Dto.Doctor;
 using AutoMapper;
 using MediatR;
 using ProfileRepositories;
 using Profiles;
 
-namespace Application.Handlers;
+namespace Application.Handlers.DoctorHandlers;
 
-internal class UpdateDoctorHandler : IRequestHandler<UpdateDoctorCommand>
+internal class UpdatePatientHandler : IRequestHandler<UpdateDoctorCommand>
 {
     private readonly IDoctorProfileRepo _repo;
     private readonly IMapper _mapper;
 
-    public UpdateDoctorHandler(IDoctorProfileRepo repo, IMapper mapper)
+    public UpdatePatientHandler(IDoctorProfileRepo repo, IMapper mapper)
     {
         _repo = repo;
         _mapper = mapper;

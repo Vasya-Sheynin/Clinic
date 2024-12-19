@@ -1,18 +1,18 @@
-﻿using Application.Commands;
+﻿using Application.Commands.DoctorCommands;
 using Application.Dto.Doctor;
 using AutoMapper;
 using MediatR;
 using ProfileRepositories;
 using Profiles;
 
-namespace Application.Handlers;
+namespace Application.Handlers.DoctorHandlers;
 
-internal class CreateDoctorHandler : IRequestHandler<CreateDoctorCommand, DoctorDto>
+internal class CreatePatientHandler : IRequestHandler<CreateDoctorCommand, DoctorDto>
 {
     private readonly IMapper _mapper;
     private readonly IDoctorProfileRepo _repo;
 
-    public CreateDoctorHandler(IMapper mapper, IDoctorProfileRepo repo)
+    public CreatePatientHandler(IMapper mapper, IDoctorProfileRepo repo)
     {
         _mapper = mapper;
         _repo = repo;

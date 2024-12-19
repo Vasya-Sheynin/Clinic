@@ -1,12 +1,13 @@
-﻿using Application.Commands;
+﻿using Application.Commands.DoctorCommands;
 using Application.Dto.Doctor;
-using Application.Queries;
+using Application.Filters;
+using Application.Queries.DoctorQueries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ProfilesController.Controllers;
 
-[Route("profile")]
+[Route("profile/doctor")]
 [ApiController]
 public class DoctorController : ControllerBase
 {
@@ -18,9 +19,9 @@ public class DoctorController : ControllerBase
 	}
 
 	[HttpGet]
-	public async Task<ActionResult> GetDoctorProfiles()
+	public async Task<ActionResult> GetDoctorProfiles([FromQuery]DoctorFilterParams filterParams)
 	{
-		var profiles = await _sender.Send(new GetDoctorProfilesQuery());
+		var profiles = await _sender.Send(new GetDoctorProfilesQuery(filterParams));
 
 		return Ok(profiles);
 	}

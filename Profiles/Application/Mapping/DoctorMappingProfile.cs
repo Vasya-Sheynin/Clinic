@@ -4,9 +4,9 @@ using Profiles;
 
 namespace Application.Mapping;
 
-public class MappingProfile : Profile
+public class DoctorMappingProfile : Profile
 {
-    public MappingProfile()
+    public DoctorMappingProfile()
     {
         CreateMap<DoctorProfile, DoctorDto>();
         CreateMap<CreateDoctorDto, DoctorProfile>()

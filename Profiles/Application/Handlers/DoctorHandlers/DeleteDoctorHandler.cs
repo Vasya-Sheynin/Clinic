@@ -1,14 +1,14 @@
-﻿using Application.Commands;
+﻿using Application.Commands.DoctorCommands;
 using MediatR;
 using ProfileRepositories;
 
-namespace Application.Handlers;
+namespace Application.Handlers.DoctorHandlers;
 
-internal class DeleteDoctorHandler : IRequestHandler<DeleteDoctorCommand>
+internal class DeletePatientHandler : IRequestHandler<DeleteDoctorCommand>
 {
     private readonly IDoctorProfileRepo _repo;
 
-    public DeleteDoctorHandler(IDoctorProfileRepo repo)
+    public DeletePatientHandler(IDoctorProfileRepo repo)
     {
         _repo = repo;
     }

@@ -1,6 +1,5 @@
 using Application.Mapping;
-using Application.Queries;
-using Microsoft.Extensions.DependencyInjection;
+using Application.Queries.DoctorQueries;
 using Persistence;
 using System.Reflection;
 
@@ -24,7 +23,7 @@ namespace ProfilesController
 
             builder.Services.AddMediatR(opt => opt.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(GetDoctorProfilesQuery))));
 
-            builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Services.AddAutoMapper(typeof(DoctorMappingProfile));
 
             var app = builder.Build();
 
@@ -39,8 +38,8 @@ namespace ProfilesController
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 

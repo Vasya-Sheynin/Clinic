@@ -1,11 +1,13 @@
-﻿namespace Profiles;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Profiles;
 
 public class ReceptionistProfile
 {
-    public Guid Id { get; set; }
-    public Guid AccountId { get; set; }
-    public Guid OfficeId { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    [Key] public Guid Id { get; set; }
+    [Required] public Guid AccountId { get; set; }
+    [Required] public Guid OfficeId { get; set; }
+    [Required] public string FirstName { get; set; }
+    [Required] public string LastName { get; set; }
     public string MiddleName { get; set; }
 }
