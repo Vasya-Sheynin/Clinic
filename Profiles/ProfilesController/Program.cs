@@ -2,48 +2,57 @@ using Application.Mapping;
 using Application.Queries.DoctorQueries;
 using Persistence;
 using System.Reflection;
+using Application.Validation;
+using MediatR;
 
-namespace ProfilesController
+using Hellang.Middleware.ProblemDetails;
+
+namespace ProfilesController;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Add services to the container.
+
+        builder.Services.AddControllers();
+        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        builder.Services.AddOpenApi();
+        builder.Services.ConfigureSwagger();
+
+        builder.Services.ConfigurePersistence(builder.Configuration);
+        builder.Services.ConfigureRepoInterfaceProviders();
+
+        builder.Services.AddMediatR(opt => opt.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(GetDoctorProfilesQuery))));
+        builder.Services.AddValidators();
+        builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+        builder.Services.AddAutoMapper(typeof(DoctorMappingProfile));
+
+        builder.Services.AddExceptionHandling(builder.Environment);
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
         {
-            var builder = WebApplication.CreateBuilder(args);
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
-            // Add services to the container.
-
-            builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
-            builder.Services.ConfigureSwagger();
-
-            builder.Services.ConfigurePersistence(builder.Configuration);
-            builder.Services.ConfigureRepoInterfaceProviders();
-
-            builder.Services.AddMediatR(opt => opt.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(GetDoctorProfilesQuery))));
-
-            builder.Services.AddAutoMapper(typeof(DoctorMappingProfile));
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-
-                app.MapOpenApi();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.MapControllers();
-
-            app.Run();
+            app.MapOpenApi();
         }
+
+        app.UseProblemDetails();
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapControllers();
+
+        app.Run();
     }
 }

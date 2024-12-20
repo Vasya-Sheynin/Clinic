@@ -19,10 +19,7 @@ internal class GetPatientsHandler : IRequestHandler<GetDoctorProfilesQuery, IEnu
 
     public Task<IEnumerable<DoctorDto>> Handle(GetDoctorProfilesQuery request, CancellationToken cancellationToken)
     {
-        var profiles = _repo.GetDoctorProfiles()
-            .Where(p => (request.FilterParams.SpecializationId is null || p.SpecializationId == request.FilterParams.SpecializationId) &&
-                (request.FilterParams.OfficeId is null || p.OfficeId == request.FilterParams.OfficeId))
-            .OrderBy(p => $"{p.FirstName} {p.LastName} {p.MiddleName}");
+        var profiles = request.FilterParams.Filter(_repo.GetDoctorProfiles());
 
         return Task.FromResult(_mapper.Map<IEnumerable<DoctorDto>>(profiles));
     }

@@ -1,4 +1,14 @@
 ﻿using Microsoft.OpenApi.Models;
+using Hellang.Middleware.ProblemDetails;
+using System.Data.Common;
+using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Application.Commands.DoctorCommands;
+using Application.Commands.PatientCommands;
+using Application.Commands.ReceptionistCommands;
+using Application.Validation.Validators.Doctor;
+using Application.Validation.Validators.Patient;
+using Application.Validation.Validators.Receptionist;
 
 namespace ProfilesController;
 
@@ -33,5 +43,35 @@ public static class Extensions
                 }
             });
         });
+    }
+
+    public static void AddExceptionHandling(this IServiceCollection services, IWebHostEnvironment environment)
+    {
+        services.AddProblemDetails(options =>
+        {
+            options.IncludeExceptionDetails = (context, exception) => environment.IsDevelopment() || environment.IsStaging();
+            options.ExceptionDetailsPropertyName = "Exception details";
+
+            options.Map<ValidationException>(ex => new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Detail = ex.Message
+            });
+
+            options.Map<DbException>(exception => new ProblemDetails
+            {
+                Status = StatusCodes.Status500InternalServerError
+            });
+        });
+    }
+
+    public static void AddValidators(this IServiceCollection services)
+    {
+        services.AddScoped<IValidator<CreateDoctorCommand>, CreateDoctorValidator>();
+        services.AddScoped<IValidator<UpdateDoctorCommand>, UpdateDoctorValidator>();
+        services.AddScoped<IValidator<CreatePatientCommand>, CreatePatientValidator>();
+        services.AddScoped<IValidator<UpdatePatientCommand>, UpdatePatientValidator>();
+        services.AddScoped<IValidator<CreateReceptionistCommand>, CreateReceptionistValidator>();
+        services.AddScoped<IValidator<UpdateReceptionistCommand>, UpdateReceptionistValidator>();
     }
 }

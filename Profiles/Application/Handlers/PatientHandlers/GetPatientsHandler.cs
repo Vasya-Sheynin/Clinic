@@ -19,13 +19,8 @@ internal class GetReceptionistsHandler : IRequestHandler<GetPatientProfilesQuery
 
     public Task<IEnumerable<PatientDto>> Handle(GetPatientProfilesQuery request, CancellationToken cancellationToken)
     {
-        var profiles = _repo.GetPatientProfiles()
-            .Where(p =>
-            {
-                var fullName = $"{p.FirstName} {p.LastName} {p.MiddleName}";
-                return request.FilterParams.FullName is null || request.FilterParams.FullName == fullName ;
-            });
-
+        var profiles = request.FilterParams.Filter(_repo.GetPatientProfiles());
+            
         return Task.FromResult(_mapper.Map<IEnumerable<PatientDto>>(profiles));
     }
 }

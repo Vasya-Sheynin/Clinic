@@ -19,7 +19,7 @@ public class PatientController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetPatientProfiles([FromQuery]PatientFilterParams filterParams)
+    public async Task<ActionResult> GetPatientProfiles([FromQuery]PatientFilter filterParams)
     {
         var profiles = await _sender.Send(new GetPatientProfilesQuery(filterParams));
 

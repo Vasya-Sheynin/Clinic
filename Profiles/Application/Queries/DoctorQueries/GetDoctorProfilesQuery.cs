@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Application.Queries.DoctorQueries;
 
-public record GetDoctorProfilesQuery(DoctorFilterParams FilterParams) : IRequest<IEnumerable<DoctorDto>>;
+public record GetDoctorProfilesQuery(DoctorFilter FilterParams) : IRequest<IEnumerable<DoctorDto>>;

@@ -20,7 +20,7 @@ internal class CreatePatientHandler : IRequestHandler<CreateDoctorCommand, Docto
 
     public async Task<DoctorDto> Handle(CreateDoctorCommand request, CancellationToken cancellationToken)
     {
-        var profileToCreate = _mapper.Map<DoctorProfile>(request.DoctorDto);
+        var profileToCreate = _mapper.Map<DoctorProfile>(request.CreateDoctorDto);
         await _repo.CreateDoctorProfileAsync(profileToCreate);
 
         var profileDto = _mapper.Map<DoctorDto>(profileToCreate);
