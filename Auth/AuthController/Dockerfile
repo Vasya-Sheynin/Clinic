@@ -12,19 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Auth/Auth.csproj", "Auth/"]
-RUN dotnet restore "./Auth/Auth.csproj"
+COPY ["Auth/AuthController/AuthController.csproj", "Auth/AuthController/"]
+RUN dotnet restore "./Auth/AuthController/AuthController.csproj"
 COPY . .
-WORKDIR "/src/Auth"
-RUN dotnet build "./Auth.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Auth/AuthController"
+RUN dotnet build "./AuthController.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Этот этап используется для публикации проекта службы, который будет скопирован на последний этап
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Auth.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./AuthController.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Auth.dll"]
+ENTRYPOINT ["dotnet", "AuthController.dll"]

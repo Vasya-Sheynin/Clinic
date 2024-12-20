@@ -1,21 +1,21 @@
-﻿using Users;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using Hellang.Middleware.ProblemDetails;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using Domain;
+using Infrastructure.AuthService.Exceptions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Infrastructure.AuthService.TokenOptions;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using FluentValidation;
 using System.Data.Common;
-using Infrastructure.AuthService.Exceptions;
-using Infrastructure.AuthService.TokenOptions;
-using Microsoft.OpenApi.Models;
 
 namespace Infrastructure.Extensions;
 
@@ -67,7 +67,7 @@ public static class ServiceExtensions
                 Type = exception.Type
             });
 
-            options.Map<ValidationException>(exception => new ProblemDetails 
+            options.Map<ValidationException>(exception => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
                 Detail = exception.Message

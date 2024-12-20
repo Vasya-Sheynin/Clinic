@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Domain;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Users;
 
 namespace Infrastructure.Extensions;
 
-public static class MigrationExtension
+public static class MigrationExtensions
 {
     public static void ApplyMigration(this IApplicationBuilder builder)
     {

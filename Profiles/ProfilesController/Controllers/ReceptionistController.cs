@@ -3,7 +3,6 @@ using Application.Dto.Receptionist;
 using Application.Queries.ReceptionistQueries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ProfilesController.Controllers;

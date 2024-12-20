@@ -4,12 +4,10 @@ using Auth.Defaults;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
 using Infrastructure.AuthService;
-using Infrastructure.AuthService.TokenOptions;
 using Infrastructure.EmailService;
 using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Users;
+using Domain;
 
 namespace Auth;
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Users;
+using Domain;
 
 namespace Auth.Defaults;
 
