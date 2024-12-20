@@ -4,7 +4,6 @@ using Persistence;
 using System.Reflection;
 using Application.Validation;
 using MediatR;
-
 using Hellang.Middleware.ProblemDetails;
 
 namespace ProfilesController;
@@ -24,6 +23,8 @@ public class Program
 
         builder.Services.ConfigurePersistence(builder.Configuration);
         builder.Services.ConfigureRepoInterfaceProviders();
+
+        builder.Services.ConfigureJWT(builder.Configuration);
 
         builder.Services.AddMediatR(opt => opt.RegisterServicesFromAssembly(Assembly.GetAssembly(typeof(GetDoctorProfilesQuery))));
         builder.Services.AddValidators();

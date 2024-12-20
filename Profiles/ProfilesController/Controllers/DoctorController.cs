@@ -3,6 +3,7 @@ using Application.Dto.Doctor;
 using Application.Filters;
 using Application.Queries.DoctorQueries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ProfilesController.Controllers;
@@ -18,6 +19,7 @@ public class DoctorController : ControllerBase
 		_sender = sender;
 	}
 
+	[Authorize(Roles = "Patient, Receptionist")]
 	[HttpGet]
 	public async Task<ActionResult> GetDoctorProfiles([FromQuery]DoctorFilter filterParams)
 	{
@@ -26,6 +28,7 @@ public class DoctorController : ControllerBase
 		return Ok(profiles);
 	}
 
+	[Authorize(Roles = "Patient, Receptionist")]
 	[HttpGet("{id}")]
 	public async Task<ActionResult> GetDoctorProfileById([FromRoute]Guid id)
 	{
@@ -34,6 +37,7 @@ public class DoctorController : ControllerBase
 		return Ok(profile);
 	}
 
+	[Authorize(Roles = "Receptionist")]
 	[HttpPost]
 	public async Task<ActionResult> CreateDoctorProfile([FromBody]CreateDoctorDto createDoctorDto)
 	{
@@ -42,6 +46,7 @@ public class DoctorController : ControllerBase
         return CreatedAtAction(nameof(GetDoctorProfileById), new { id = profile.Id }, profile);
     }
 
+	[Authorize(Roles = "Doctor, Receptionist")]
 	[HttpPut("{id}")]
 	public async Task<ActionResult> UpdateDoctorProfile([FromRoute]Guid id, [FromBody]UpdateDoctorDto updateDoctorDto)
 	{
@@ -50,6 +55,7 @@ public class DoctorController : ControllerBase
 		return Ok();
 	}
 
+	[Authorize(Roles = "Receptionist")]
 	[HttpDelete("{id}")]
 	public async Task<ActionResult> DeleteDoctorProfile([FromRoute]Guid id)
 	{

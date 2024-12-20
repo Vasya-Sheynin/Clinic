@@ -2,6 +2,7 @@
 using Application.Dto.Receptionist;
 using Application.Queries.ReceptionistQueries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ public class ReceptionistController : ControllerBase
         _sender = sender;
     }
 
+    [Authorize(Roles = "Receptionist")]
     [HttpGet]
     public async Task<ActionResult> GetReceptionistProfiles()
     {
@@ -26,6 +28,7 @@ public class ReceptionistController : ControllerBase
         return Ok(profiles);
     }
 
+    [Authorize(Roles = "Receptionist")]
     [HttpGet("{id}")]
     public async Task<ActionResult> GetReceptionistProfileById([FromRoute] Guid id)
     {
@@ -34,6 +37,7 @@ public class ReceptionistController : ControllerBase
         return Ok(profile);
     }
 
+    [Authorize(Roles = "Receptionist")]
     [HttpPost]
     public async Task<ActionResult> CreateReceptionistProfile([FromBody] CreateReceptionistDto createReceptionistDto)
     {
@@ -42,6 +46,7 @@ public class ReceptionistController : ControllerBase
         return CreatedAtAction(nameof(GetReceptionistProfileById), new { id = profile.Id }, profile);
     }
 
+    [Authorize(Roles = "Receptionist")]
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateReceptionistProfile([FromRoute] Guid id, [FromBody] UpdateReceptionistDto updateReceptionistDto)
     {
@@ -50,6 +55,7 @@ public class ReceptionistController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = "Receptionist")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteReceptionistProfile([FromRoute] Guid id)
     {

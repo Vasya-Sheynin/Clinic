@@ -9,6 +9,9 @@ using Application.Commands.ReceptionistCommands;
 using Application.Validation.Validators.Doctor;
 using Application.Validation.Validators.Patient;
 using Application.Validation.Validators.Receptionist;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ProfilesController;
 
@@ -62,6 +65,31 @@ public static class Extensions
             {
                 Status = StatusCodes.Status500InternalServerError
             });
+        });
+    }
+
+    public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
+    {
+        var jwtSettings = configuration.GetSection("JwtSettings");
+        var secretKey = Environment.GetEnvironmentVariable("JWT_KEY");
+        services.AddAuthentication(opt =>
+        {
+            opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings.GetSection("validIssuer").Value,
+                ValidAudience = jwtSettings.GetSection("validAudience").Value,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                ClockSkew = TimeSpan.FromSeconds(5)
+            };
         });
     }
 
