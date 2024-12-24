@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.ProfileRepositories;
@@ -22,5 +23,12 @@ public static class Extensions
         services.AddScoped<IDoctorProfileRepo, DoctorProfileRepo>();
         services.AddScoped<IPatientProfileRepo, PatientProfileRepo>();
         services.AddScoped<IReceptionistProfileRepo, ReceptionistProfileRepo>();
+    }
+
+    public static void ApplyMigration(this IApplicationBuilder builder)
+    {
+        using IServiceScope scope = builder.ApplicationServices.CreateScope();
+        using ProfilesDbContext context = scope.ServiceProvider.GetRequiredService<ProfilesDbContext>();
+        context.Database.Migrate();
     }
 }

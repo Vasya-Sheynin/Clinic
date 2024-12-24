@@ -45,6 +45,8 @@ public class Program
             app.MapOpenApi();
         }
 
+        app.ApplyMigration();
+
         app.UseProblemDetails();
 
         app.UseHttpsRedirection();

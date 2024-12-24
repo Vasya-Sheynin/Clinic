@@ -8,5 +8,5 @@ public record CreateReceptionistDto
     [Required] public Guid OfficeId { get; set; }
     [Required] public string FirstName { get; set; }
     [Required] public string LastName { get; set; }
-    public string MiddleName { get; set; }
+    public string? MiddleName { get; set; }
 }

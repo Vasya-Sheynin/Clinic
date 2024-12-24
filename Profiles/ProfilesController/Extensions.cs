@@ -12,6 +12,7 @@ using Application.Validation.Validators.Receptionist;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Reflection;
 
 namespace ProfilesController;
 
@@ -95,11 +96,6 @@ public static class Extensions
 
     public static void AddValidators(this IServiceCollection services)
     {
-        services.AddScoped<IValidator<CreateDoctorCommand>, CreateDoctorValidator>();
-        services.AddScoped<IValidator<UpdateDoctorCommand>, UpdateDoctorValidator>();
-        services.AddScoped<IValidator<CreatePatientCommand>, CreatePatientValidator>();
-        services.AddScoped<IValidator<UpdatePatientCommand>, UpdatePatientValidator>();
-        services.AddScoped<IValidator<CreateReceptionistCommand>, CreateReceptionistValidator>();
-        services.AddScoped<IValidator<UpdateReceptionistCommand>, UpdateReceptionistValidator>();
+        services.AddValidatorsFromAssembly(typeof(CreateDoctorValidator).Assembly);
     }
 }
