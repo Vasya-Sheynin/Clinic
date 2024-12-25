@@ -10,9 +10,9 @@ namespace Application.Handlers.DoctorHandlers;
 internal class CreateDoctor : IRequestHandler<CreateDoctorCommand, DoctorDto>
 {
     private readonly IMapper _mapper;
-    private readonly IDoctorProfileRepo _repo;
+    private readonly IUnitOfWork _repo;
 
-    public CreateDoctor(IMapper mapper, IDoctorProfileRepo repo)
+    public CreateDoctor(IMapper mapper, IUnitOfWork repo)
     {
         _mapper = mapper;
         _repo = repo;
@@ -21,7 +21,8 @@ internal class CreateDoctor : IRequestHandler<CreateDoctorCommand, DoctorDto>
     public async Task<DoctorDto> Handle(CreateDoctorCommand request, CancellationToken cancellationToken)
     {
         var profileToCreate = _mapper.Map<DoctorProfile>(request.CreateDoctorDto);
-        await _repo.CreateDoctorProfileAsync(profileToCreate);
+        await _repo.DoctorProfileRepo.CreateDoctorProfileAsync(profileToCreate);
+        await _repo.SaveAsync();
 
         var profileDto = _mapper.Map<DoctorDto>(profileToCreate);
         return profileDto;

@@ -6,16 +6,17 @@ namespace Application.Handlers.DoctorHandlers;
 
 internal class DeleteDoctorHandler : IRequestHandler<DeleteDoctorCommand>
 {
-    private readonly IDoctorProfileRepo _repo;
+    private readonly IUnitOfWork _repo;
 
-    public DeleteDoctorHandler(IDoctorProfileRepo repo)
+    public DeleteDoctorHandler(IUnitOfWork repo)
     {
         _repo = repo;
     }
 
     public async Task Handle(DeleteDoctorCommand request, CancellationToken cancellationToken)
     {
-        var profile = await _repo.GetDoctorProfileAsync(request.Id);
-        await _repo.DeleteDoctorProfileAsync(profile);
+        var profile = await _repo.DoctorProfileRepo.GetDoctorProfileAsync(request.Id);
+        await _repo.DoctorProfileRepo.DeleteDoctorProfileAsync(profile);
+        await _repo.SaveAsync();
     }
 }

@@ -8,10 +8,10 @@ namespace Application.Handlers.DoctorHandlers;
 
 internal class GetDoctorByIdHandler : IRequestHandler<GetDoctorProfileByIdQuery, DoctorDto>
 {
-    private readonly IDoctorProfileRepo _repo;
+    private readonly IUnitOfWork _repo;
     private readonly IMapper _mapper;
 
-    public GetDoctorByIdHandler(IDoctorProfileRepo repo, IMapper mapper)
+    public GetDoctorByIdHandler(IUnitOfWork repo, IMapper mapper)
     {
         _repo = repo;
         _mapper = mapper;
@@ -19,7 +19,7 @@ internal class GetDoctorByIdHandler : IRequestHandler<GetDoctorProfileByIdQuery,
 
     public async Task<DoctorDto> Handle(GetDoctorProfileByIdQuery request, CancellationToken cancellationToken)
     {
-        var profile = await _repo.GetDoctorProfileAsync(request.Id);
+        var profile = await _repo.DoctorProfileRepo.GetDoctorProfileAsync(request.Id);
 
         return _mapper.Map<DoctorDto>(profile);
     }

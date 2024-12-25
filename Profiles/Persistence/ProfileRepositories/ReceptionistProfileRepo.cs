@@ -17,13 +17,11 @@ public class ReceptionistProfileRepo : IReceptionistProfileRepo
     public async Task CreateReceptionistProfileAsync(ReceptionistProfile profile)
     {
         await _profilesDbContext.AddAsync(profile);
-        await _profilesDbContext.SaveChangesAsync();
     }
 
     public async Task DeleteReceptionistProfileAsync(ReceptionistProfile profile)
     {
         _profilesDbContext.Remove(profile);
-        await _profilesDbContext.SaveChangesAsync();
     }
 
     public async Task<ReceptionistProfile?> GetReceptionistProfileAsync(Guid id)
@@ -55,6 +53,5 @@ public class ReceptionistProfileRepo : IReceptionistProfileRepo
     public async Task UpdateReceptionistProfileAsync(ReceptionistProfile newProfile)
     {
         _profilesDbContext.Update(newProfile);
-        await _profilesDbContext.SaveChangesAsync();
     }
 }

@@ -2,32 +2,20 @@
 
 public class PaginationParams
 {
-    private int _pageSize = 10;
-    private int _pageIndex = 1;
+    private const int defaultPageSize = 10;
+    private const int defaultPageIndex = 1;
+    private int _pageSize = defaultPageSize;
+    private int _pageIndex = defaultPageIndex;
 
     public int PageSize 
     { 
-        get
-        {
-            return _pageSize;
-        }
-        set 
-        { 
-            if (value > 0) 
-                _pageSize = value;
-        } 
+        get => _pageSize;
+        set => _pageSize = value > 0 ? value : defaultPageSize;
     }
 
     public int PageIndex
     {
-        get
-        {
-            return _pageIndex;
-        }
-        set
-        {
-            if (value > 0)
-                _pageIndex = value;
-        }
+        get => _pageIndex;
+        set => _pageIndex = value > 0 ? value : defaultPageIndex;
     }
 }

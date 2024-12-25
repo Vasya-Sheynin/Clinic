@@ -9,10 +9,10 @@ namespace Application.Handlers.DoctorHandlers;
 
 internal class UpdateDoctorHandler : IRequestHandler<UpdateDoctorCommand>
 {
-    private readonly IDoctorProfileRepo _repo;
+    private readonly IUnitOfWork _repo;
     private readonly IMapper _mapper;
 
-    public UpdateDoctorHandler(IDoctorProfileRepo repo, IMapper mapper)
+    public UpdateDoctorHandler(IUnitOfWork repo, IMapper mapper)
     {
         _repo = repo;
         _mapper = mapper;
@@ -20,8 +20,9 @@ internal class UpdateDoctorHandler : IRequestHandler<UpdateDoctorCommand>
 
     public async Task Handle(UpdateDoctorCommand request, CancellationToken cancellationToken)
     {
-        var profile = await _repo.GetDoctorProfileAsync(request.Id);
+        var profile = await _repo.DoctorProfileRepo.GetDoctorProfileAsync(request.Id);
         _mapper.Map<UpdateDoctorDto, DoctorProfile>(request.UpdateDoctorDto, profile);
-        await _repo.UpdateDoctorProfileAsync(profile);
+        await _repo.DoctorProfileRepo.UpdateDoctorProfileAsync(profile);
+        await _repo.SaveAsync();
     }
 }

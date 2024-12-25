@@ -23,6 +23,7 @@ public static class Extensions
         services.AddScoped<IDoctorProfileRepo, DoctorProfileRepo>();
         services.AddScoped<IPatientProfileRepo, PatientProfileRepo>();
         services.AddScoped<IReceptionistProfileRepo, ReceptionistProfileRepo>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 
     public static void ApplyMigration(this IApplicationBuilder builder)

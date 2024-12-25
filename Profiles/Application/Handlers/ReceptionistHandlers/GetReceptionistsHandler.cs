@@ -8,10 +8,10 @@ namespace Application.Handlers.ReceptionistHandlers;
 
 internal class GetReceptionistsHandler : IRequestHandler<GetReceptionistProfilesQuery, IEnumerable<ReceptionistDto>>
 {
-    private readonly IReceptionistProfileRepo _repo;
+    private readonly IUnitOfWork _repo;
     private readonly IMapper _mapper;
 
-    public GetReceptionistsHandler(IReceptionistProfileRepo repo, IMapper mapper)
+    public GetReceptionistsHandler(IUnitOfWork repo, IMapper mapper)
     {
         _repo = repo;
         _mapper = mapper;
@@ -19,7 +19,7 @@ internal class GetReceptionistsHandler : IRequestHandler<GetReceptionistProfiles
 
     public Task<IEnumerable<ReceptionistDto>> Handle(GetReceptionistProfilesQuery request, CancellationToken cancellationToken)
     {
-        var profiles = _repo.GetReceptionistProfiles(request.PaginationParams);
+        var profiles = _repo.ReceptionistProfileRepo.GetReceptionistProfiles(request.PaginationParams);
 
         return Task.FromResult(_mapper.Map<IEnumerable<ReceptionistDto>>(profiles));
     }

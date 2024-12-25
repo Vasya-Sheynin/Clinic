@@ -17,13 +17,11 @@ public class DoctorProfileRepo : IDoctorProfileRepo
     public async Task CreateDoctorProfileAsync(DoctorProfile profile)
     {
         await _profilesDbContext.AddAsync(profile);
-        await _profilesDbContext.SaveChangesAsync();
     }
 
     public async Task DeleteDoctorProfileAsync(DoctorProfile profile)
     {
         _profilesDbContext.Remove(profile);
-        await _profilesDbContext.SaveChangesAsync();
     }
 
     public async Task<DoctorProfile?> GetDoctorProfileAsync(Guid id)
@@ -82,6 +80,5 @@ public class DoctorProfileRepo : IDoctorProfileRepo
     public async Task UpdateDoctorProfileAsync(DoctorProfile newProfile)
     {
         _profilesDbContext.Update(newProfile);
-        await _profilesDbContext.SaveChangesAsync();
     }
 }

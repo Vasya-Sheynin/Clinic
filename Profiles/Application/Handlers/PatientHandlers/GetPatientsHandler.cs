@@ -8,10 +8,10 @@ namespace Application.Handlers.PatientHandlers;
 
 internal class GetPatientsHandler : IRequestHandler<GetPatientProfilesQuery, IEnumerable<PatientDto>>
 {
-    private readonly IPatientProfileRepo _repo;
+    private readonly IUnitOfWork _repo;
     private readonly IMapper _mapper;
 
-    public GetPatientsHandler(IPatientProfileRepo repo, IMapper mapper)
+    public GetPatientsHandler(IUnitOfWork repo, IMapper mapper)
     {
         _repo = repo;
         _mapper = mapper;
@@ -19,7 +19,7 @@ internal class GetPatientsHandler : IRequestHandler<GetPatientProfilesQuery, IEn
 
     public Task<IEnumerable<PatientDto>> Handle(GetPatientProfilesQuery request, CancellationToken cancellationToken)
     {
-        var profiles = _repo.GetPatientProfiles(request.FilterParams, request.PaginationParams);
+        var profiles = _repo.PatientProfileRepo.GetPatientProfiles(request.FilterParams, request.PaginationParams);
             
         return Task.FromResult(_mapper.Map<IEnumerable<PatientDto>>(profiles));
     }

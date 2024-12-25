@@ -10,9 +10,9 @@ namespace Application.Handlers.ReceptionistHandlers;
 internal class CreateReceptionistHandler : IRequestHandler<CreateReceptionistCommand, ReceptionistDto>
 {
     private readonly IMapper _mapper;
-    private readonly IReceptionistProfileRepo _repo;
+    private readonly IUnitOfWork _repo;
 
-    public CreateReceptionistHandler(IMapper mapper, IReceptionistProfileRepo repo)
+    public CreateReceptionistHandler(IMapper mapper, IUnitOfWork repo)
     {
         _mapper = mapper;
         _repo = repo;
@@ -21,7 +21,8 @@ internal class CreateReceptionistHandler : IRequestHandler<CreateReceptionistCom
     public async Task<ReceptionistDto> Handle(CreateReceptionistCommand request, CancellationToken cancellationToken)
     {
         var profileToCreate = _mapper.Map<ReceptionistProfile>(request.CreateReceptionistDto);
-        await _repo.CreateReceptionistProfileAsync(profileToCreate);
+        await _repo.ReceptionistProfileRepo.CreateReceptionistProfileAsync(profileToCreate);
+        await _repo.SaveAsync();
 
         var profileDto = _mapper.Map<ReceptionistDto>(profileToCreate);
         return profileDto;
