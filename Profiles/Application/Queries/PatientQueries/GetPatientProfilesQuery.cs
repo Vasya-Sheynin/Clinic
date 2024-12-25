@@ -1,7 +1,9 @@
 ﻿using Application.Dto.Patient;
-using Application.Filters;
 using MediatR;
+using ProfileRepositories;
+using ProfileRepositories.Pagination;
 
 namespace Application.Queries.PatientQueries;
 
-public record GetPatientProfilesQuery(PatientFilter FilterParams) : IRequest<IEnumerable<PatientDto>>;
+public record GetPatientProfilesQuery(
+    PatientFilter FilterParams, PaginationParams PaginationParams) : IRequest<IEnumerable<PatientDto>>;

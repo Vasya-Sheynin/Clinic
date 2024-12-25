@@ -4,11 +4,11 @@ using ProfileRepositories;
 
 namespace Application.Handlers.DoctorHandlers;
 
-internal class DeletePatientHandler : IRequestHandler<DeleteDoctorCommand>
+internal class DeleteDoctorHandler : IRequestHandler<DeleteDoctorCommand>
 {
     private readonly IDoctorProfileRepo _repo;
 
-    public DeletePatientHandler(IDoctorProfileRepo repo)
+    public DeleteDoctorHandler(IDoctorProfileRepo repo)
     {
         _repo = repo;
     }

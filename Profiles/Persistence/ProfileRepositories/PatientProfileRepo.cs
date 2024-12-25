@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProfileRepositories;
+using ProfileRepositories.Pagination;
 using Profiles;
 
 namespace Persistence.ProfileRepositories;
@@ -32,18 +33,33 @@ public class PatientProfileRepo : IPatientProfileRepo
         return profile;
     }
 
-    public IEnumerable<PatientProfile>? GetPatientProfiles()
+    public IEnumerable<PatientProfile>? GetPatientProfiles(PatientFilter filterParams, PaginationParams paginationParams)
     {
-        var profiles = _profilesDbContext.PatientProfiles.Select(p => new PatientProfile
+        var query = _profilesDbContext.PatientProfiles.AsQueryable();
+
+        if (!string.IsNullOrEmpty(filterParams.FullName))
         {
-            Id = p.Id,
-            AccountId = p.AccountId,
-            FirstName = p.FirstName,
-            LastName = p.LastName,
-            MiddleName = p.MiddleName,
-            IsLinkedToAccount = p.IsLinkedToAccount,
-            DateOfBirth = p.DateOfBirth,
-        })
+            query = query.Where(p =>
+                EF.Functions.Like(p.FirstName + " " + p.LastName + " " + (p.MiddleName != null ? p.MiddleName : string.Empty), "%" + filterParams.FullName + "%")
+            );
+        }
+
+        var profiles = query
+            .OrderBy(p => p.FirstName)
+            .ThenBy(p => p.LastName)
+            .ThenBy(p => p.MiddleName)
+            .Skip((paginationParams.PageIndex - 1) * paginationParams.PageSize)
+            .Take(paginationParams.PageSize)
+            .Select(p => new PatientProfile
+            {
+                Id = p.Id,
+                AccountId = p.AccountId,
+                FirstName = p.FirstName,
+                LastName = p.LastName,
+                MiddleName = p.MiddleName,
+                IsLinkedToAccount = p.IsLinkedToAccount,
+                DateOfBirth = p.DateOfBirth,
+            })
             .AsEnumerable();
 
         return profiles;

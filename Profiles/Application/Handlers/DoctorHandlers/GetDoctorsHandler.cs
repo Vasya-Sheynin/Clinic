@@ -6,12 +6,12 @@ using ProfileRepositories;
 
 namespace Application.Handlers.DoctorHandlers;
 
-internal class GetPatientsHandler : IRequestHandler<GetDoctorProfilesQuery, IEnumerable<DoctorDto>>
+internal class GetDoctorsHandler : IRequestHandler<GetDoctorProfilesQuery, IEnumerable<DoctorDto>>
 {
     private readonly IDoctorProfileRepo _repo;
     private readonly IMapper _mapper;
 
-    public GetPatientsHandler(IDoctorProfileRepo repo, IMapper mapper)
+    public GetDoctorsHandler(IDoctorProfileRepo repo, IMapper mapper)
     {
         _repo = repo;
         _mapper = mapper;
@@ -19,7 +19,7 @@ internal class GetPatientsHandler : IRequestHandler<GetDoctorProfilesQuery, IEnu
 
     public Task<IEnumerable<DoctorDto>> Handle(GetDoctorProfilesQuery request, CancellationToken cancellationToken)
     {
-        var profiles = request.FilterParams.Filter(_repo.GetDoctorProfiles());
+        var profiles = _repo.GetDoctorProfiles(request.FilterParams, request.PaginationParams);
 
         return Task.FromResult(_mapper.Map<IEnumerable<DoctorDto>>(profiles));
     }

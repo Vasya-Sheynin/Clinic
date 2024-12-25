@@ -19,7 +19,7 @@ internal class GetReceptionistsHandler : IRequestHandler<GetReceptionistProfiles
 
     public Task<IEnumerable<ReceptionistDto>> Handle(GetReceptionistProfilesQuery request, CancellationToken cancellationToken)
     {
-        var profiles = _repo.GetReceptionistProfiles();
+        var profiles = _repo.GetReceptionistProfiles(request.PaginationParams);
 
         return Task.FromResult(_mapper.Map<IEnumerable<ReceptionistDto>>(profiles));
     }

@@ -7,12 +7,12 @@ using Profiles;
 
 namespace Application.Handlers.DoctorHandlers;
 
-internal class CreatePatientHandler : IRequestHandler<CreateDoctorCommand, DoctorDto>
+internal class CreateDoctor : IRequestHandler<CreateDoctorCommand, DoctorDto>
 {
     private readonly IMapper _mapper;
     private readonly IDoctorProfileRepo _repo;
 
-    public CreatePatientHandler(IMapper mapper, IDoctorProfileRepo repo)
+    public CreateDoctor(IMapper mapper, IDoctorProfileRepo repo)
     {
         _mapper = mapper;
         _repo = repo;

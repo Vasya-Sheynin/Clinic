@@ -7,12 +7,12 @@ using Profiles;
 
 namespace Application.Handlers.DoctorHandlers;
 
-internal class UpdatePatientHandler : IRequestHandler<UpdateDoctorCommand>
+internal class UpdateDoctorHandler : IRequestHandler<UpdateDoctorCommand>
 {
     private readonly IDoctorProfileRepo _repo;
     private readonly IMapper _mapper;
 
-    public UpdatePatientHandler(IDoctorProfileRepo repo, IMapper mapper)
+    public UpdateDoctorHandler(IDoctorProfileRepo repo, IMapper mapper)
     {
         _repo = repo;
         _mapper = mapper;

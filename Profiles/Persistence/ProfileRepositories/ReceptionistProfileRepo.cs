@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProfileRepositories;
+using ProfileRepositories.Pagination;
 using Profiles;
 
 namespace Persistence.ProfileRepositories;
@@ -32,18 +33,21 @@ public class ReceptionistProfileRepo : IReceptionistProfileRepo
         return profile;
     }
 
-    public IEnumerable<ReceptionistProfile>? GetReceptionistProfiles()
+    public IEnumerable<ReceptionistProfile>? GetReceptionistProfiles(PaginationParams paginationParams)
     {
-        var profiles = _profilesDbContext.ReceptionistProfiles.Select(p => new ReceptionistProfile
-        {
-            Id = p.Id,
-            AccountId = p.AccountId,
-            OfficeId = p.OfficeId,
-            FirstName = p.FirstName,
-            LastName = p.LastName,
-            MiddleName = p.MiddleName,
-        }
-            ).AsEnumerable();
+        var profiles = _profilesDbContext.ReceptionistProfiles
+            .Skip((paginationParams.PageIndex - 1) * paginationParams.PageSize)
+            .Take(paginationParams.PageSize)
+            .Select(p => new ReceptionistProfile
+            {
+                Id = p.Id,
+                AccountId = p.AccountId,
+                OfficeId = p.OfficeId,
+                FirstName = p.FirstName,
+                LastName = p.LastName,
+                MiddleName = p.MiddleName,
+            })
+            .AsEnumerable();
 
         return profiles;
     }

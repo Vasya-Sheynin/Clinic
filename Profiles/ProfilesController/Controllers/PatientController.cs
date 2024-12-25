@@ -1,10 +1,11 @@
 ﻿using Application.Commands.PatientCommands;
 using Application.Dto.Patient;
-using Application.Filters;
 using Application.Queries.PatientQueries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProfileRepositories;
+using ProfileRepositories.Pagination;
 
 namespace ProfilesController.Controllers;
 
@@ -21,9 +22,9 @@ public class PatientController : ControllerBase
 
     [Authorize(Roles = "Receptionist")]
     [HttpGet]
-    public async Task<ActionResult> GetPatientProfiles([FromQuery]PatientFilter filterParams)
+    public async Task<ActionResult> GetPatientProfiles([FromQuery]PatientFilter filterParams, [FromQuery]PaginationParams paginationParams)
     {
-        var profiles = await _sender.Send(new GetPatientProfilesQuery(filterParams));
+        var profiles = await _sender.Send(new GetPatientProfilesQuery(filterParams, paginationParams));
 
         return Ok(profiles);
     }

@@ -4,6 +4,7 @@ using Application.Queries.ReceptionistQueries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProfileRepositories.Pagination;
 
 namespace ProfilesController.Controllers;
 
@@ -20,9 +21,9 @@ public class ReceptionistController : ControllerBase
 
     [Authorize(Roles = "Receptionist")]
     [HttpGet]
-    public async Task<ActionResult> GetReceptionistProfiles()
+    public async Task<ActionResult> GetReceptionistProfiles([FromQuery]PaginationParams paginationParams)
     {
-        var profiles = await _sender.Send(new GetReceptionistProfilesQuery());
+        var profiles = await _sender.Send(new GetReceptionistProfilesQuery(paginationParams));
 
         return Ok(profiles);
     }

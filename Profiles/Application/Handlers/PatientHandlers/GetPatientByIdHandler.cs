@@ -6,12 +6,12 @@ using Application.Queries.PatientQueries;
 
 namespace Application.Handlers.PatientHandlers;
 
-internal class GetReceptionistByIdHandler : IRequestHandler<GetPatientProfileByIdQuery, PatientDto>
+internal class GetPatientByIdHandler : IRequestHandler<GetPatientProfileByIdQuery, PatientDto>
 {
     private readonly IPatientProfileRepo _repo;
     private readonly IMapper _mapper;
 
-    public GetReceptionistByIdHandler(IPatientProfileRepo repo, IMapper mapper)
+    public GetPatientByIdHandler(IPatientProfileRepo repo, IMapper mapper)
     {
         _repo = repo;
         _mapper = mapper;
