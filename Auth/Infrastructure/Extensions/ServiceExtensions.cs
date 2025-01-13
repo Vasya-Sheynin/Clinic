@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using FluentValidation;
 using System.Data.Common;
+using MassTransit;
 
 namespace Infrastructure.Extensions;
 
@@ -130,5 +131,24 @@ public static class ServiceExtensions
 
         services.Configure<AccessTokenOptions>(configuration.GetSection("JwtSettings"));
         services.Configure<RefreshTokenOptions>(configuration.GetSection("RefreshSettings"));
+    }
+
+    public static void ConfigureMassTransit(this IServiceCollection services, IConfiguration configuration)
+    {
+        var rabbitMqSettings = configuration.GetSection("RabbitMQSettings");
+
+        services.AddMassTransit(options =>
+        {
+            options.SetKebabCaseEndpointNameFormatter();
+            options.UsingRabbitMq((context, configurator) =>
+            {
+                configurator.Host(rabbitMqSettings.GetSection("Host").Value, h =>
+                {
+                    h.Username(rabbitMqSettings.GetSection("Username").Value);
+                    h.Password(rabbitMqSettings.GetSection("Password").Value);
+                });
+                configurator.ConfigureEndpoints(context);
+            });
+        });
     }
 }

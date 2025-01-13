@@ -38,6 +38,8 @@ public class Program
         builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
         builder.Services.AddScoped<IEmailService, EmailService>();
 
+        builder.Services.ConfigureMassTransit(builder.Configuration);
+
         builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailConfiguration"));
 
         builder.Services.AddExceptionHandling(builder.Environment);
