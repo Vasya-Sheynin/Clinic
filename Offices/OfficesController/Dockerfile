@@ -13,6 +13,10 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Offices/OfficesController/OfficesController.csproj", "Offices/OfficesController/"]
+COPY ["Offices/Persistence/Persistence.csproj", "Offices/Persistence/"]
+COPY ["Offices/Application/Application.csproj", "Offices/Application/"]
+COPY ["Offices/Entities/OfficeRepository/OfficeRepositories.csproj", "Offices/Entities/OfficeRepository/"]
+COPY ["Offices/Entities/Office/Offices.csproj", "Offices/Entities/Office/"]
 RUN dotnet restore "./Offices/OfficesController/OfficesController.csproj"
 COPY . .
 WORKDIR "/src/Offices/OfficesController"

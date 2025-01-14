@@ -13,11 +13,6 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Profiles/ProfilesController/ProfilesController.csproj", "Profiles/ProfilesController/"]
-COPY ["Profiles/Infrastructure/Infrastructure.csproj", "Profiles/Infrastructure/"]
-COPY ["Messages/Messages.csproj", "Messages/"]
-COPY ["Profiles/Application/Application.csproj", "Profiles/Application/"]
-COPY ["Profiles/Entities/ProfileRepositories/ProfileRepositories.csproj", "Profiles/Entities/ProfileRepositories/"]
-COPY ["Profiles/Entities/Profiles/Profiles.csproj", "Profiles/Entities/Profiles/"]
 RUN dotnet restore "./Profiles/ProfilesController/ProfilesController.csproj"
 COPY . .
 WORKDIR "/src/Profiles/ProfilesController"

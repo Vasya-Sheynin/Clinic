@@ -8,11 +8,11 @@ namespace Persistence;
 
 public static class PersistenceServiceExtension
 {
-    public static void AddSqlConnectionFactory(this IServiceCollection services, IConfiguration configuration)
+    public static void AddSqlConnectionFactory(this IServiceCollection services)
     {
         services.AddSingleton(serviceProvider =>
         {
-            var connString = configuration.GetConnectionString("DbConnection") ??
+            var connString = Environment.GetEnvironmentVariable("DB_CONNECTION") ??
                 throw new ApplicationException("Db connection string is empty"); 
 
             return new SqlConnectionFactory(connString);

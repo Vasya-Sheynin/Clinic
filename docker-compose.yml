@@ -1,0 +1,87 @@
+services:
+  authcontroller:
+    image: ${DOCKER_REGISTRY-}authcontroller
+    build:
+      context: .
+      dockerfile: Auth/AuthController/Dockerfile
+    environment:
+      - DB_CONNECTION=Server=db; Database=Auth; User Id=sa; Password=YourStrong!Passw0rd; Encrypt=True; TrustServerCertificate=True;
+      - JWT_KEY=rpK3dMglgZgsosi9uFEfPbpPdukhIbiP
+      - ADMIN_NAME=admin
+      - ADMIN_EMAIL=admin@adminMail.by
+      - ADMIN_PASSWORD=h1gHLyS3curedP4ssW0rd
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+      - SMTP_USER=name
+      - SMTP_PASS=pass
+    depends_on:
+      - db
+      - rabbitmq
+    ports:
+      - 5001:8080
+      - 5101:8081
+    volumes:
+      - db_data:/var/lib/sqlserver
+
+  profilescontroller:
+    image: ${DOCKER_REGISTRY-}profilescontroller
+    build:
+      context: .
+      dockerfile: Profiles/ProfilesController/Dockerfile
+    environment:
+      - DB_CONNECTION=Server=db; Database=Profiles; User Id=sa; Password=YourStrong!Passw0rd; Encrypt=True; TrustServerCertificate=True;
+      - JWT_KEY=rpK3dMglgZgsosi9uFEfPbpPdukhIbiP
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+    depends_on:
+      - db
+      - rabbitmq
+    ports:
+      - 5002:8080
+      - 5102:8081
+    volumes:
+      - db_data:/var/lib/sqlserver
+  
+  officescontroller:
+    image: ${DOCKER_REGISTRY-}officescontroller
+    build:
+      context: .
+      dockerfile: Offices/OfficesController/Dockerfile
+    environment:
+      - DB_CONNECTION=Server=db; Database=Offices; User Id=sa; Password=YourStrong!Passw0rd; Encrypt=True; TrustServerCertificate=True;
+      - JWT_KEY=rpK3dMglgZgsosi9uFEfPbpPdukhIbiP
+    depends_on:
+      - db
+    ports:
+      - 5003:8080
+      - 5103:8081
+    volumes:
+      - db_data:/var/lib/sqlserver
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=y
+      - MSSQL_SA_PASSWORD=YourStrong!Passw0rd
+    ports:
+      - 1433:1433
+    volumes:
+      - db_data:/var/lib/sqlserver
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"   
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_data:
+  db_data:  

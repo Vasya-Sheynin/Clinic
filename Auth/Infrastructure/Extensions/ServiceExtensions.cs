@@ -96,11 +96,11 @@ public static class ServiceExtensions
         builder.AddEntityFrameworkStores<UsersDbContext>();
     }
 
-    public static void ConfigurePersistence(this IServiceCollection services, IConfiguration config)
+    public static void ConfigurePersistence(this IServiceCollection services)
     {
         services.AddDbContext<UsersDbContext>(options =>
         {
-            var connectionString = config.GetConnectionString("DbConnection");
+            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
             options.UseSqlServer(connectionString);
         });
     }
@@ -133,19 +133,17 @@ public static class ServiceExtensions
         services.Configure<RefreshTokenOptions>(configuration.GetSection("RefreshSettings"));
     }
 
-    public static void ConfigureMassTransit(this IServiceCollection services, IConfiguration configuration)
+    public static void ConfigureMassTransit(this IServiceCollection services)
     {
-        var rabbitMqSettings = configuration.GetSection("RabbitMQSettings");
-
         services.AddMassTransit(options =>
         {
             options.SetKebabCaseEndpointNameFormatter();
             options.UsingRabbitMq((context, configurator) =>
             {
-                configurator.Host(rabbitMqSettings.GetSection("Host").Value, h =>
+                configurator.Host(Environment.GetEnvironmentVariable("RABBITMQ_HOST"), h =>
                 {
-                    h.Username(rabbitMqSettings.GetSection("Username").Value);
-                    h.Password(rabbitMqSettings.GetSection("Password").Value);
+                    h.Username(Environment.GetEnvironmentVariable("RABBITMQ_USER"));
+                    h.Password(Environment.GetEnvironmentVariable("RABBITMQ_PASS"));
                 });
                 configurator.ConfigureEndpoints(context);
             });

@@ -22,7 +22,7 @@ public class Program
         builder.Services.AddOpenApi();
         builder.Services.ConfigureSwagger();
 
-        builder.Services.ConfigurePersistence(builder.Configuration);
+        builder.Services.ConfigurePersistence();
         builder.Services.ConfigureRepoInterfaceProviders();
 
         builder.Services.ConfigureJWT(builder.Configuration);
@@ -33,7 +33,7 @@ public class Program
 
         builder.Services.AddAutoMapper(typeof(DoctorMappingProfile));
 
-        builder.Services.ConfigureMassTransit(builder.Configuration);
+        builder.Services.ConfigureMassTransit();
 
         builder.Services.AddExceptionHandling(builder.Environment);
 
