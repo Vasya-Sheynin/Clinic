@@ -12,24 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Profiles/ProfilesController/ProfilesController.csproj", "Profiles/ProfilesController/"]
-COPY ["Profiles/Infrastructure/Infrastructure.csproj", "Profiles/Infrastructure/"]
-COPY ["Messages/Messages.csproj", "Messages/"]
-COPY ["Profiles/Application/Application.csproj", "Profiles/Application/"]
-COPY ["Profiles/Entities/ProfileRepositories/ProfileRepositories.csproj", "Profiles/Entities/ProfileRepositories/"]
-COPY ["Profiles/Entities/Profiles/Profiles.csproj", "Profiles/Entities/Profiles/"]
-RUN dotnet restore "./Profiles/ProfilesController/ProfilesController.csproj"
+COPY ["Offices/OfficesController/OfficesController.csproj", "Offices/OfficesController/"]
+RUN dotnet restore "./Offices/OfficesController/OfficesController.csproj"
 COPY . .
-WORKDIR "/src/Profiles/ProfilesController"
-RUN dotnet build "./ProfilesController.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Offices/OfficesController"
+RUN dotnet build "./OfficesController.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Этот этап используется для публикации проекта службы, который будет скопирован на последний этап
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./ProfilesController.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./OfficesController.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ProfilesController.dll"]
+ENTRYPOINT ["dotnet", "OfficesController.dll"]

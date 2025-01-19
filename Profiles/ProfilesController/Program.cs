@@ -1,10 +1,11 @@
 using Application.Mapping;
 using Application.Queries.DoctorQueries;
-using Persistence;
+using Infrastructure.Persistence;
 using System.Reflection;
 using Application.Validation;
 using MediatR;
 using Hellang.Middleware.ProblemDetails;
+using Infrastructure.RabbitMq;
 
 namespace ProfilesController;
 
@@ -21,7 +22,7 @@ public class Program
         builder.Services.AddOpenApi();
         builder.Services.ConfigureSwagger();
 
-        builder.Services.ConfigurePersistence(builder.Configuration);
+        builder.Services.ConfigurePersistence();
         builder.Services.ConfigureRepoInterfaceProviders();
 
         builder.Services.ConfigureJWT(builder.Configuration);
@@ -31,6 +32,8 @@ public class Program
         builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
         builder.Services.AddAutoMapper(typeof(DoctorMappingProfile));
+
+        builder.Services.ConfigureMassTransit();
 
         builder.Services.AddExceptionHandling(builder.Environment);
 

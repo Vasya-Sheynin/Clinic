@@ -3,53 +3,43 @@ using ProfileRepositories;
 using ProfileRepositories.Pagination;
 using Profiles;
 
-namespace Persistence.ProfileRepositories;
+namespace Infrastructure.Persistence.ProfileRepositories;
 
-public class DoctorProfileRepo : IDoctorProfileRepo
+public class PatientProfileRepo : IPatientProfileRepo
 {
     private readonly ProfilesDbContext _profilesDbContext;
 
-    public DoctorProfileRepo(ProfilesDbContext profilesDbContext)
+    public PatientProfileRepo(ProfilesDbContext profilesDbContext)
     {
         _profilesDbContext = profilesDbContext;
     }
 
-    public async Task CreateDoctorProfileAsync(DoctorProfile profile)
+    public async Task CreatePatientProfileAsync(PatientProfile profile)
     {
         await _profilesDbContext.AddAsync(profile);
     }
 
-    public async Task DeleteDoctorProfileAsync(DoctorProfile profile)
+    public async Task DeletePatientProfileAsync(PatientProfile profile)
     {
         _profilesDbContext.Remove(profile);
     }
 
-    public async Task<DoctorProfile?> GetDoctorProfileAsync(Guid id)
+    public async Task<PatientProfile?> GetPatientProfileAsync(Guid id)
     {
-        var profile = await _profilesDbContext.DoctorProfiles.FirstOrDefaultAsync(p =>  p.Id == id);
+        var profile = await _profilesDbContext.PatientProfiles.FirstOrDefaultAsync(p => p.Id == id);
 
         return profile;
     }
 
-    public IEnumerable<DoctorProfile>? GetDoctorProfiles(DoctorFilter filterParams, PaginationParams paginationParams)
+    public IEnumerable<PatientProfile>? GetPatientProfiles(PatientFilter filterParams, PaginationParams paginationParams)
     {
-        var query = _profilesDbContext.DoctorProfiles.AsQueryable();
+        var query = _profilesDbContext.PatientProfiles.AsQueryable();
 
         if (!string.IsNullOrEmpty(filterParams.FullName))
         {
             query = query.Where(p =>
                 EF.Functions.Like(p.FirstName + " " + p.LastName + " " + (p.MiddleName != null ? p.MiddleName : string.Empty), "%" + filterParams.FullName + "%")
-            );            
-        }
-
-        if (filterParams.SpecializationId != null)
-        {
-            query = query.Where(p => p.SpecializationId == filterParams.SpecializationId);
-        }
-
-        if (filterParams.OfficeId != null)
-        {
-            query = query.Where(p => p.OfficeId == filterParams.OfficeId);
+            );
         }
 
         var profiles = query
@@ -58,26 +48,22 @@ public class DoctorProfileRepo : IDoctorProfileRepo
             .ThenBy(p => p.MiddleName)
             .Skip((paginationParams.PageIndex - 1) * paginationParams.PageSize)
             .Take(paginationParams.PageSize)
-            .Select(p => new DoctorProfile
+            .Select(p => new PatientProfile
             {
                 Id = p.Id,
                 AccountId = p.AccountId,
-                SpecializationId = p.SpecializationId,
-                OfficeId = p.OfficeId,
                 FirstName = p.FirstName,
                 LastName = p.LastName,
                 MiddleName = p.MiddleName,
-                Status = p.Status,
+                IsLinkedToAccount = p.IsLinkedToAccount,
                 DateOfBirth = p.DateOfBirth,
-                CareerStartDate = p.CareerStartDate,
             })
             .AsEnumerable();
 
         return profiles;
     }
 
-
-    public async Task UpdateDoctorProfileAsync(DoctorProfile newProfile)
+    public async Task UpdatePatientProfileAsync(PatientProfile newProfile)
     {
         _profilesDbContext.Update(newProfile);
     }

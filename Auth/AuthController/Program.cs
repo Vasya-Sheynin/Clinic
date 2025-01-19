@@ -30,13 +30,15 @@ public class Program
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<UsersDbContext>();
 
-        builder.Services.ConfigurePersistence(builder.Configuration);
+        builder.Services.ConfigurePersistence();
         builder.Services.ConfigureIdentity();
         builder.Services.ConfigureJWT(builder.Configuration);
 
         builder.Services.AddScoped<IValidator<RegisterDto>, RegisterDtoValidator>();
         builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
         builder.Services.AddScoped<IEmailService, EmailService>();
+
+        builder.Services.ConfigureMassTransit();
 
         builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailConfiguration"));
 

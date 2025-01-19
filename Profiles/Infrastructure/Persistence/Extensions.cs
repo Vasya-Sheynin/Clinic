@@ -1,19 +1,19 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Infrastructure.Persistence.ProfileRepositories;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.ProfileRepositories;
 using ProfileRepositories;
 
-namespace Persistence;
+namespace Infrastructure.Persistence;
 
 public static class Extensions
 {
-    public static void ConfigurePersistence(this IServiceCollection services, IConfiguration config)
+    public static void ConfigurePersistence(this IServiceCollection services)
     {
         services.AddDbContext<ProfilesDbContext>(options =>
         {
-            var connectionString = config.GetConnectionString("DbConnection");
+            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
             options.UseSqlServer(connectionString);
         });
     }

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using FluentValidation;
 using System.Data.Common;
+using MassTransit;
 
 namespace Infrastructure.Extensions;
 
@@ -95,11 +96,11 @@ public static class ServiceExtensions
         builder.AddEntityFrameworkStores<UsersDbContext>();
     }
 
-    public static void ConfigurePersistence(this IServiceCollection services, IConfiguration config)
+    public static void ConfigurePersistence(this IServiceCollection services)
     {
         services.AddDbContext<UsersDbContext>(options =>
         {
-            var connectionString = config.GetConnectionString("DbConnection");
+            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
             options.UseSqlServer(connectionString);
         });
     }
@@ -130,5 +131,22 @@ public static class ServiceExtensions
 
         services.Configure<AccessTokenOptions>(configuration.GetSection("JwtSettings"));
         services.Configure<RefreshTokenOptions>(configuration.GetSection("RefreshSettings"));
+    }
+
+    public static void ConfigureMassTransit(this IServiceCollection services)
+    {
+        services.AddMassTransit(options =>
+        {
+            options.SetKebabCaseEndpointNameFormatter();
+            options.UsingRabbitMq((context, configurator) =>
+            {
+                configurator.Host(Environment.GetEnvironmentVariable("RABBITMQ_HOST"), h =>
+                {
+                    h.Username(Environment.GetEnvironmentVariable("RABBITMQ_USER"));
+                    h.Password(Environment.GetEnvironmentVariable("RABBITMQ_PASS"));
+                });
+                configurator.ConfigureEndpoints(context);
+            });
+        });
     }
 }

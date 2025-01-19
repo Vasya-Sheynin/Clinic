@@ -34,7 +34,7 @@ public class EmailService : IEmailService
         using var client = new SmtpClient();
         await client.ConnectAsync(_emailOptions.Value.SmtpServer, _emailOptions.Value.Port, true);
         client.AuthenticationMechanisms.Remove("XOAUTH2");
-        await client.AuthenticateAsync(_emailOptions.Value.UserName, _emailOptions.Value.Password);
+        await client.AuthenticateAsync(Environment.GetEnvironmentVariable("SMTP_USER"), Environment.GetEnvironmentVariable("SMTP_PASS"));
         await client.SendAsync(mailMessage);
         await client.DisconnectAsync(true);
     }

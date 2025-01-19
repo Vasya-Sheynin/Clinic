@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Profiles;
 
-namespace Persistence;
+namespace Infrastructure.Persistence;
 
 public class ProfilesDbContext : DbContext
 {
@@ -11,6 +11,6 @@ public class ProfilesDbContext : DbContext
 
     public ProfilesDbContext(DbContextOptions<ProfilesDbContext> options) : base(options)
     {
-        
+
     }
 }

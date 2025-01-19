@@ -1,6 +1,6 @@
 ﻿using ProfileRepositories;
 
-namespace Persistence;
+namespace Infrastructure.Persistence;
 
 public class UnitOfWork : IUnitOfWork
 {
@@ -13,9 +13,9 @@ public class UnitOfWork : IUnitOfWork
 
 
     public UnitOfWork(
-        ProfilesDbContext dbContext, 
-        IDoctorProfileRepo doctorProfileRepo, 
-        IPatientProfileRepo patientProfileRepo, 
+        ProfilesDbContext dbContext,
+        IDoctorProfileRepo doctorProfileRepo,
+        IPatientProfileRepo patientProfileRepo,
         IReceptionistProfileRepo receptionistProfileRepo)
     {
         _profilesDbContext = dbContext;
@@ -23,7 +23,7 @@ public class UnitOfWork : IUnitOfWork
         PatientProfileRepo = patientProfileRepo;
         ReceptionistProfileRepo = receptionistProfileRepo;
     }
-   
+
     public void Dispose()
     {
         _profilesDbContext.Dispose();

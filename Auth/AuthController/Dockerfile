@@ -13,6 +13,11 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Auth/AuthController/AuthController.csproj", "Auth/AuthController/"]
+COPY ["Auth/Infrastructure/Infrastructure.csproj", "Auth/Infrastructure/"]
+COPY ["Messages/Messages.csproj", "Messages/"]
+COPY ["Auth/Application/Application.csproj", "Auth/Application/"]
+COPY ["Auth/Domain/Persistence/Persistence.csproj", "Auth/Domain/Persistence/"]
+COPY ["Auth/Domain/User/User.csproj", "Auth/Domain/User/"]
 RUN dotnet restore "./Auth/AuthController/AuthController.csproj"
 COPY . .
 WORKDIR "/src/Auth/AuthController"

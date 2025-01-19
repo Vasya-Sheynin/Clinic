@@ -3,7 +3,7 @@ using ProfileRepositories;
 using ProfileRepositories.Pagination;
 using Profiles;
 
-namespace Persistence.ProfileRepositories;
+namespace Infrastructure.Persistence.ProfileRepositories;
 
 public class ReceptionistProfileRepo : IReceptionistProfileRepo
 {
@@ -11,7 +11,7 @@ public class ReceptionistProfileRepo : IReceptionistProfileRepo
 
     public ReceptionistProfileRepo(ProfilesDbContext profilesDbContext)
     {
-         _profilesDbContext = profilesDbContext;
+        _profilesDbContext = profilesDbContext;
     }
 
     public async Task CreateReceptionistProfileAsync(ReceptionistProfile profile)

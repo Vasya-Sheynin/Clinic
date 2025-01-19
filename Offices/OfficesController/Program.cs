@@ -23,7 +23,7 @@ namespace OfficesController
             builder.Services.ConfigureSwagger();
             builder.Services.ConfigureJWT(builder.Configuration);
 
-            builder.Services.AddSqlConnectionFactory(builder.Configuration);
+            builder.Services.AddSqlConnectionFactory();
 
             builder.Services.AddAutoMapper(typeof(OfficeMapper));
 

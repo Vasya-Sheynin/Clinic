@@ -11,6 +11,8 @@ using Infrastructure.AuthService.Exceptions;
 using Microsoft.Extensions.Options;
 using Infrastructure.AuthService.TokenOptions;
 using Infrastructure.EmailService;
+using MassTransit;
+using Messages;
 
 namespace Infrastructure.AuthService;
 
@@ -21,16 +23,19 @@ public class AuthenticationService : IAuthenticationService
     private readonly IValidator<RegisterDto> _registerValidator;
     private readonly IOptions<AccessTokenOptions> _accessTokenOptions;
     private readonly IOptions<RefreshTokenOptions> _refreshTokenOptions;
+    private readonly IPublishEndpoint _publishEndpoint;
 
     public AuthenticationService(
         UserManager<User> accountManager, 
         IEmailService emailService,
+        IPublishEndpoint publishEndpoint,
         IValidator<RegisterDto> registerValidator,
         IOptions<AccessTokenOptions> accessTokenOptions, 
         IOptions<RefreshTokenOptions> refreshTokenOptions)
     {
         _userManager = accountManager;
         _emailService = emailService;
+        _publishEndpoint = publishEndpoint;
         _registerValidator = registerValidator;
         _accessTokenOptions = accessTokenOptions;
         _refreshTokenOptions = refreshTokenOptions;
@@ -87,6 +92,11 @@ public class AuthenticationService : IAuthenticationService
         user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(_refreshTokenOptions.Value.ExpirationTime);
 
         await _userManager.UpdateAsync(user);
+
+        await _publishEndpoint.Publish(new AccountCreated
+        {
+            AccountId = Guid.Parse(user.Id)
+        });
 
         var message = new Message(user.Email, "Welcome Letter", "You have registered successfully!");
         //await _emailService.SendEmail(message);
