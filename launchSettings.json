@@ -6,7 +6,8 @@
       "serviceActions": {
         "authcontroller": "StartDebugging",
         "profilescontroller": "StartDebugging",
-        "officescontroller": "StartDebugging"
+        "officescontroller": "StartDebugging",
+        "documentscontroller": "StartDebugging"
       }
     }
   }

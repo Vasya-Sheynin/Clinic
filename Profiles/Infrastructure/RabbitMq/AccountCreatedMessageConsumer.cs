@@ -18,6 +18,7 @@ public class AccountCreatedMessageConsumer : IConsumer<AccountCreated>
     {
         await _unitOfWork.PatientProfileRepo.CreatePatientProfileAsync(new PatientProfile
         {
+            Id = Guid.NewGuid(),
             AccountId = context.Message.AccountId
         });
 
