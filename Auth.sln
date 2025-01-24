@@ -65,6 +65,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Documents\Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Documents\Infrastructure\Infrastructure.csproj", "{F7177874-45D1-4A74-BD21-3F827DD63EE1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{C378AC6C-71BB-460E-9774-B56A0849F5D2}"
+	ProjectSection(SolutionItems) = preProject
+		.env = .env
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

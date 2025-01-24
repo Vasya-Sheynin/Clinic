@@ -7,16 +7,16 @@ services:
       context: .
       dockerfile: Auth/AuthController/Dockerfile
     environment:
-      - DB_CONNECTION=Server=db; Database=Auth; User Id=sa; Password=YourStrong!Passw0rd; Encrypt=True; TrustServerCertificate=True;
-      - JWT_KEY=rpK3dMglgZgsosi9uFEfPbpPdukhIbiP
-      - ADMIN_NAME=admin
-      - ADMIN_EMAIL=admin@adminMail.by
-      - ADMIN_PASSWORD=h1gHLyS3curedP4ssW0rd
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_USER=guest
-      - RABBITMQ_PASS=guest
-      - SMTP_USER=name
-      - SMTP_PASS=pass
+      - DB_CONNECTION=${AUTH_DB_CONNECTION}
+      - JWT_KEY=${JWT_KEY}
+      - ADMIN_NAME=${ADMIN_NAME}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
     depends_on:
       - db
       - rabbitmq
@@ -32,11 +32,11 @@ services:
       context: .
       dockerfile: Profiles/ProfilesController/Dockerfile
     environment:
-      - DB_CONNECTION=Server=db; Database=Profiles; User Id=sa; Password=YourStrong!Passw0rd; Encrypt=True; TrustServerCertificate=True;
-      - JWT_KEY=rpK3dMglgZgsosi9uFEfPbpPdukhIbiP
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_USER=guest
-      - RABBITMQ_PASS=guest
+      - DB_CONNECTION=${PROFILES_DB_CONNECTION}
+      - JWT_KEY=${JWT_KEY}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
     depends_on:
       - db
       - rabbitmq
@@ -52,8 +52,8 @@ services:
       context: .
       dockerfile: Offices/OfficesController/Dockerfile
     environment:
-      - DB_CONNECTION=Server=db; Database=Offices; User Id=sa; Password=YourStrong!Passw0rd; Encrypt=True; TrustServerCertificate=True;
-      - JWT_KEY=rpK3dMglgZgsosi9uFEfPbpPdukhIbiP
+      - DB_CONNECTION=${OFFICES_DB_CONNECTION}
+      - JWT_KEY=${JWT_KEY}
     depends_on:
       - db
     ports:
@@ -68,10 +68,10 @@ services:
       context: .
       dockerfile: Documents/DocumentsController/Dockerfile
     environment:
-      - BLOB_CONN_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
-      - JWT_KEY=rpK3dMglgZgsosi9uFEfPbpPdukhIbiP
-      - MONGODB_URI=mongodb://root:example@mongo:27017/
-      - DB_NAME=DocumentsDb
+      - BLOB_CONN_STRING=${BLOB_CONN_STRING}
+      - JWT_KEY=${JWT_KEY}
+      - MONGODB_URI=${MONGODB_URI}
+      - DB_NAME=${DB_NAME}
     depends_on:
       - mongo
       - azurite
@@ -87,7 +87,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       - ACCEPT_EULA=y
-      - MSSQL_SA_PASSWORD=YourStrong!Passw0rd
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
     ports:
       - 1433:1433
     volumes:
@@ -98,16 +98,16 @@ services:
     ports:
       - "27017:27017"
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=example
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
 
   #RabbitMq
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
     ports:
       - "5672:5672"   
       - "15672:15672"
