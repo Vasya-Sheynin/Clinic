@@ -53,6 +53,8 @@ services:
       dockerfile: Offices/OfficesController/Dockerfile
     environment:
       - DB_CONNECTION=${OFFICES_DB_CONNECTION}
+      - REDIS_CONN_STRING=${REDIS_CONN_STRING}
+      - MASTER_DB_CONNECTION=${MASTER_DB_CONNECTION}
       - JWT_KEY=${JWT_KEY}
     depends_on:
       - db
@@ -125,9 +127,19 @@ services:
       - "10000:10000"
       - "10001:10001"
       - "10002:10002"
+  
+  #Redis cache
+  redis:
+    image: redis:latest
+    container_name: "redis"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/var/lib/redis
     
 volumes:
   rabbitmq_data:
   db_data:  
   mongo_data:  
   azure_data:
+  redis_data:

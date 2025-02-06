@@ -19,7 +19,7 @@ namespace Persistence
         {
             using var connection = _sqlConnectionFactory.GetConnection();
             var sql = "INSERT INTO Offices (Id, PhotoId, Address, RegistryPhoneNumber, IsActive) VALUES (@Id, @PhotoId, @Address, @RegistryPhoneNumber, @IsActive)";
-            await connection.ExecuteAsync(sql, office);
+            await connection.ExecuteAsync(sql, office);        
         }
 
         public async Task DeleteOffice(Office office)

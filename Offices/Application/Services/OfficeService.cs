@@ -4,6 +4,7 @@ using Application.Dto;
 using AutoMapper;
 using Application.Exceptions;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace Application;
 
@@ -13,18 +14,21 @@ public class OfficeService : IOfficeService
     private readonly IMapper _mapper;
     private readonly IValidator<CreateOfficeDto> _createOfficeDtoValidator;
     private readonly IValidator<UpdateOfficeDto> _updateOfficeDtoValidator;
+    private readonly HybridCache _cache;
 
     public OfficeService(
         IOfficeRepository officeRepository, 
         IMapper mapper,
         IValidator<CreateOfficeDto> createOfficeDtoValidator,
-        IValidator<UpdateOfficeDto> updateOfficeDtoValidator
+        IValidator<UpdateOfficeDto> updateOfficeDtoValidator,
+        HybridCache cache
         )
     {
         _officeRepository = officeRepository;
         _mapper = mapper;
         _createOfficeDtoValidator = createOfficeDtoValidator;
         _updateOfficeDtoValidator = updateOfficeDtoValidator;
+        _cache = cache;
     }
 
     public async Task<OfficeDto> CreateOffice(CreateOfficeDto createOfficeDto)
@@ -45,11 +49,14 @@ public class OfficeService : IOfficeService
             throw new OfficeNotFoundException("Office with provided id wasn't found");
 
         await _officeRepository.DeleteOffice(officeToDelete);
+        await _cache.RemoveAsync($"office-{id}");
     }
 
     public async Task<OfficeDto?> GetOffice(Guid id)
     {
-        var office = await _officeRepository.GetOffice(id);
+        var office = await _cache.GetOrCreateAsync(
+            $"office-{id}",
+            async token => await _officeRepository.GetOffice(id));
 
         return _mapper.Map<OfficeDto?>(office);
     }
@@ -72,5 +79,6 @@ public class OfficeService : IOfficeService
         _mapper.Map(updateOfficeDto, officeToUpdate);
 
         await _officeRepository.UpdateOffice(officeToUpdate);
+        await _cache.SetAsync($"office-{id}", officeToUpdate);
     }
 }

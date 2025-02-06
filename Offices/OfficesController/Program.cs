@@ -4,6 +4,8 @@ using Application.Mapper;
 using Application.Validators;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
+using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.OpenApi.Writers;
 using OfficeRepositories;
 using Persistence;
 
@@ -35,7 +37,11 @@ namespace OfficesController
 
             builder.Services.AddExceptionHandling(builder.Environment);
 
+            builder.Services.AddCache();
+
             var app = builder.Build();
+
+            DbInitializer.EnsureCreated("Offices", "Offices");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -49,7 +55,6 @@ namespace OfficesController
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

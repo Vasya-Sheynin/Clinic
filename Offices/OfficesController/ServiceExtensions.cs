@@ -3,6 +3,7 @@ using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -86,5 +87,27 @@ public static class ServiceExtensions
                 ClockSkew = TimeSpan.FromSeconds(5)
             };
         });
+    }
+
+    public static void AddCache(this IServiceCollection services)
+    {
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = Environment.GetEnvironmentVariable("REDIS_CONN_STRING");
+        });
+
+#pragma warning disable EXTEXP0018
+        services.AddHybridCache(options =>
+        {
+            options.MaximumPayloadBytes = 1024 * 1024 * 10;
+            options.MaximumKeyLength = 512;
+
+            options.DefaultEntryOptions = new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromMinutes(5),
+                LocalCacheExpiration = TimeSpan.FromMinutes(5)
+            };
+        });
+#pragma warning restore EXTEXP0018
     }
 }
