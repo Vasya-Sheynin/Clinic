@@ -1,4 +1,18 @@
 services:
+  #gateway
+  apigateway:
+    image: ${DOCKER_REGISTRY-}apigateway
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    container_name: apigateway
+    ports:
+      - "8001:8081"
+    depends_on:
+      - authcontroller
+      - profilescontroller
+      - officescontroller
+      - documentscontroller
 
   #controllers
   authcontroller:
@@ -6,6 +20,7 @@ services:
     build:
       context: .
       dockerfile: Auth/AuthController/Dockerfile
+    container_name: authcontroller
     environment:
       - DB_CONNECTION=${AUTH_DB_CONNECTION}
       - JWT_KEY=${JWT_KEY}
@@ -31,6 +46,7 @@ services:
     build:
       context: .
       dockerfile: Profiles/ProfilesController/Dockerfile
+    container_name: profilescontroller
     environment:
       - DB_CONNECTION=${PROFILES_DB_CONNECTION}
       - JWT_KEY=${JWT_KEY}
@@ -51,6 +67,7 @@ services:
     build:
       context: .
       dockerfile: Offices/OfficesController/Dockerfile
+    container_name: officescontroller
     environment:
       - DB_CONNECTION=${OFFICES_DB_CONNECTION}
       - REDIS_CONN_STRING=${REDIS_CONN_STRING}
@@ -69,11 +86,12 @@ services:
     build:
       context: .
       dockerfile: Documents/DocumentsController/Dockerfile
+    container_name: documentscontroller
     environment:
       - BLOB_CONN_STRING=${BLOB_CONN_STRING}
       - JWT_KEY=${JWT_KEY}
       - MONGODB_URI=${MONGODB_URI}
-      - DB_NAME=${DB_NAME}
+      - DOCUMENTS_DB_NAME=${DOCUMENTS_DB_NAME}
     depends_on:
       - mongo
       - azurite
@@ -87,6 +105,7 @@ services:
   #persistence
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: db
     environment:
       - ACCEPT_EULA=y
       - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
@@ -99,6 +118,7 @@ services:
     image: mongo:latest
     ports:
       - "27017:27017"
+    container_name: mongo
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
@@ -119,7 +139,7 @@ services:
   #Azure BLOB storage
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
-    container_name: "azurite"
+    container_name: azurite
     hostname: azurite
     restart: always
     command: azurite-blob --blobHost 0.0.0.0 --blobPort 10000
@@ -131,15 +151,18 @@ services:
   #Redis cache
   redis:
     image: redis:latest
-    container_name: "redis"
+    container_name: redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/var/lib/redis
-    
+
 volumes:
   rabbitmq_data:
   db_data:  
   mongo_data:  
   azure_data:
   redis_data:
+
+
+

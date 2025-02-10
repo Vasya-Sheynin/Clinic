@@ -13,7 +13,7 @@ namespace OfficesController
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +41,7 @@ namespace OfficesController
 
             var app = builder.Build();
 
-            DbInitializer.EnsureCreated("Offices", "Offices");
+            await DbInitializer.EnsureCreated("Offices", "Offices");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -51,8 +51,6 @@ namespace OfficesController
             }
 
             app.UseProblemDetails();
-
-            app.UseHttpsRedirection();
 
             app.UseAuthorization();
 

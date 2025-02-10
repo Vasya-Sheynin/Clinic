@@ -9,7 +9,7 @@ using ProfileRepositories.Pagination;
 
 namespace ProfilesController.Controllers;
 
-[Route("profile/doctor")]
+[Route("api/profile/doctor")]
 [ApiController]
 public class DoctorController : ControllerBase
 {

@@ -6,7 +6,7 @@ using Offices;
 
 namespace OfficesController.Controllers;
 
-[Route("office")]
+[Route("api/office")]
 [ApiController]
 public class OfficesController : ControllerBase
 {
@@ -17,7 +17,7 @@ public class OfficesController : ControllerBase
         _officeService = officeService;
     }
 
-    //[Authorize(Roles = "Receptionist")]
+    [Authorize(Roles = "Receptionist")]
     [HttpGet("{id}")]
     public async Task<ActionResult<Office>> GetOffice([FromRoute] Guid id)
     {
@@ -26,7 +26,7 @@ public class OfficesController : ControllerBase
         return Ok(office);
     }
 
-    //[Authorize(Roles = "Receptionist")]
+    [Authorize(Roles = "Receptionist")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Office>>> GetOffices()
     {
@@ -35,7 +35,7 @@ public class OfficesController : ControllerBase
         return Ok(offices);
     }
     
-    //[Authorize(Roles = "Receptionist")]
+    [Authorize(Roles = "Receptionist")]
     [HttpPost]
     public async Task<ActionResult> CreateOffice([FromBody] CreateOfficeDto createOfficeDto)
     {
@@ -44,7 +44,7 @@ public class OfficesController : ControllerBase
         return CreatedAtAction(nameof(GetOffice), new { office.Id }, office);
     }
 
-    //[Authorize(Roles = "Receptionist")]
+    [Authorize(Roles = "Receptionist")]
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateOffice([FromRoute] Guid id, [FromBody] UpdateOfficeDto updateOfficeDto)
     {
@@ -53,7 +53,7 @@ public class OfficesController : ControllerBase
         return NoContent();
     }
 
-    //[Authorize(Roles = "Receptionist")]
+    [Authorize(Roles = "Receptionist")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteOffice([FromRoute] Guid id)
     {

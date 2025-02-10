@@ -9,13 +9,13 @@ namespace Persistence;
 
 public static class DbInitializer
 {
-    public static void EnsureCreated(string dbName, string tableName)
+    public static async Task EnsureCreated(string dbName, string tableName)
     {
-        EnsureDatabaseCreated(dbName);
-        EnsureTableCreated(tableName);
+        await EnsureDatabaseCreated(dbName);
+        await EnsureTableCreated(tableName);
     }
 
-    private static void EnsureDatabaseCreated(string dbName)
+    private static async Task EnsureDatabaseCreated(string dbName)
     {
         var connString = Environment.GetEnvironmentVariable("MASTER_DB_CONNECTION");
         using var masterConnection = new SqlConnection(connString);
@@ -24,10 +24,10 @@ public static class DbInitializer
             IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{dbName}')
                 CREATE DATABASE {dbName};
             """;
-        masterConnection.Execute(sql);
+        await masterConnection.ExecuteAsync(sql);
     }
 
-    private static void EnsureTableCreated(string tableName)
+    private static async Task EnsureTableCreated(string tableName)
     {
         var sb = new StringBuilder();
         sb.Append($"""
@@ -48,7 +48,7 @@ public static class DbInitializer
 
         var connString = Environment.GetEnvironmentVariable("DB_CONNECTION");
         using var connection = new SqlConnection(connString);
-        connection.Execute(sb.ToString());
+        await connection.ExecuteAsync(sb.ToString());
     }
 
     private static string GetSqlType(Type propertyType)

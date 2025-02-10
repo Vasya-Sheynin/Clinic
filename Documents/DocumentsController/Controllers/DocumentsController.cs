@@ -1,12 +1,13 @@
 ﻿using Application.AzureBlobService;
 using Application.DocumentsService;
 using Application.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace DocumentsController.Controllers;
 
-[Route("document")]
+[Route("api/document")]
 [ApiController]
 public class DocumentsController : ControllerBase
 {
@@ -24,6 +25,7 @@ public class DocumentsController : ControllerBase
         _blobServiceOptions = blobServiceOptions;
     }
 
+    [Authorize(Roles = "Patient, Doctor, Receptionist")]
     [HttpGet("{id}")]
     public async Task<ActionResult> GetById([FromRoute] Guid id)
     {
@@ -38,6 +40,7 @@ public class DocumentsController : ControllerBase
         return File(blob.Stream, blob.ContentType);
     }
 
+    [Authorize(Roles = "Patient, Doctor, Receptionist")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<DocumentDto>>> GetFilesData()
     {
@@ -48,6 +51,7 @@ public class DocumentsController : ControllerBase
             return Ok(docs);
     }
 
+    [Authorize(Roles = "Doctor, Receptionist")]
     [HttpPost]
     public async Task<ActionResult> Create([FromForm] CreateDocumentDto createDocumentDto)
     {
@@ -62,6 +66,7 @@ public class DocumentsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { createdDoc.Id }, createdDoc);
     }
 
+    [Authorize(Roles = "Doctor, Receptionist")]
     [HttpPut("{id}")]
     public async Task<ActionResult> Update([FromRoute] Guid id, [FromForm] UpdateDocumentDto updateDocumentDto)
     {
@@ -80,6 +85,7 @@ public class DocumentsController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = "Doctor, Receptionist")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete([FromRoute] Guid id)
     {

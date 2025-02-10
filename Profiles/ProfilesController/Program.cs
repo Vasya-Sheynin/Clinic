@@ -52,8 +52,6 @@ public class Program
 
         app.UseProblemDetails();
 
-        app.UseHttpsRedirection();
-
         app.UseAuthentication();
         app.UseAuthorization();
 

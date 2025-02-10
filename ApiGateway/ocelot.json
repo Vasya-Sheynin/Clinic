@@ -1,0 +1,110 @@
+{
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:8001"
+  },
+  "Routes": [
+    //Auth Api
+    {
+      "UpstreamPathTemplate": "/auth/{action}",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/auth/{action}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "authcontroller",
+          "Port": 8080
+        }
+      ]
+    },
+
+    //Documents Api
+    {
+      "UpstreamPathTemplate": "/document",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamPathTemplate": "/api/document",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "documentscontroller",
+          "Port": 8080
+        }
+      ],
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "2s",
+        "Limit": 5,
+        "PeriodTimespan": 3
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/document/{id}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/document/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "documentscontroller",
+          "Port": 8080
+        }
+      ],
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "2s",
+        "Limit": 5,
+        "PeriodTimespan": 3
+      }
+    },
+
+    //Offices Api
+    {
+      "UpstreamPathTemplate": "/office",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamPathTemplate": "/api/office",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "officescontroller",
+          "Port": 8080
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/office/{id}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/office/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "officescontroller",
+          "Port": 8080
+        }
+      ]
+    },
+
+    //Profiles Api
+    {
+      "UpstreamPathTemplate": "/profile/{type}",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamPathTemplate": "/api/profile/{type}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "profilescontroller",
+          "Port": 8080
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/profile/{type}/{id}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+      "DownstreamPathTemplate": "/api/profile/{type}/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "profilescontroller",
+          "Port": 8080
+        }
+      ]
+    }
+  ]
+}

@@ -8,7 +8,7 @@ using ProfileRepositories.Pagination;
 
 namespace ProfilesController.Controllers;
 
-[Route("profile/receptionist")]
+[Route("api/profile/receptionist")]
 [ApiController]
 public class ReceptionistController : ControllerBase
 {
