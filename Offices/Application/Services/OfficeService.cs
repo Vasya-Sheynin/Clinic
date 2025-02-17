@@ -5,6 +5,7 @@ using AutoMapper;
 using Application.Exceptions;
 using FluentValidation;
 using Microsoft.Extensions.Caching.Hybrid;
+using Application.Services;
 
 namespace Application;
 
@@ -14,14 +15,14 @@ public class OfficeService : IOfficeService
     private readonly IMapper _mapper;
     private readonly IValidator<CreateOfficeDto> _createOfficeDtoValidator;
     private readonly IValidator<UpdateOfficeDto> _updateOfficeDtoValidator;
-    private readonly HybridCache _cache;
+    private readonly ICachingService _cache;
 
     public OfficeService(
         IOfficeRepository officeRepository, 
         IMapper mapper,
         IValidator<CreateOfficeDto> createOfficeDtoValidator,
         IValidator<UpdateOfficeDto> updateOfficeDtoValidator,
-        HybridCache cache
+        ICachingService cache
         )
     {
         _officeRepository = officeRepository;
@@ -56,7 +57,10 @@ public class OfficeService : IOfficeService
     {
         var office = await _cache.GetOrCreateAsync(
             $"office-{id}",
-            async token => await _officeRepository.GetOffice(id));
+            async token => { 
+                var o = await _officeRepository.GetOffice(id); 
+                return o ?? throw new OfficeNotFoundException("Office with provided id wasn't found");
+            });
 
         return _mapper.Map<OfficeDto?>(office);
     }

@@ -1,6 +1,7 @@
 using Application;
 using Application.Dto;
 using Application.Mapper;
+using Application.Services;
 using Application.Validators;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
@@ -34,6 +35,7 @@ namespace OfficesController
 
             builder.Services.AddScoped<IOfficeRepository, OfficeRepository>();
             builder.Services.AddScoped<IOfficeService, OfficeService>();
+            builder.Services.AddScoped<ICachingService, CachingService>();
 
             builder.Services.AddExceptionHandling(builder.Environment);
 
