@@ -11,7 +11,6 @@ using Moq;
 using OfficeRepositories;
 using Offices;
 using System;
-using UnitTests.Util;
 
 namespace UnitTests;
 
@@ -90,7 +89,7 @@ public class OfficeServiceTests
         {
             foreach (var o in receivedOffices)
             {
-                if (!_offices.Contains(_mapper.Map<Office>(o), new OfficeComparer()))
+                if (!_offices.Contains(_mapper.Map<Office>(o)))
                     return false;
             }
 
@@ -128,7 +127,7 @@ public class OfficeServiceTests
     }
 
     [TestCase("7f9b3f4a-12e6-4d9c-9b7a-6f8b3d4e9c7f")]
-    public void Delete_DoesNotThrow_WhenOfficeExists(Guid id)
+    public void Delete_Succeeds_WhenOfficeExists(Guid id)
     {
         // Arrange
         var actualOffice = _offices.FirstOrDefault(x => x.Id == id);
@@ -149,15 +148,15 @@ public class OfficeServiceTests
         Assert.ThrowsAsync<OfficeNotFoundException>(async () => await _officeService.UpdateOffice(id, updateOfficeDto));
     }
 
-    [TestCaseSource(typeof(TestCaseSources), nameof(TestCaseSources.UpdateOfficeTestCasesInvalid))]
+    [Test, TestCaseSource(typeof(TestCaseSources), nameof(TestCaseSources.UpdateOfficeTestCasesInvalid))]
     public void Update_Throws_WhenOfficeInvalid(Guid id, UpdateOfficeDto updateOfficeDto)
     {
         //Assert
         Assert.ThrowsAsync<ValidationException>(async () => await _officeService.UpdateOffice(id, updateOfficeDto));
     }
 
-    [TestCaseSource(typeof(TestCaseSources), nameof(TestCaseSources.CreateOfficeTestCasesInvalid))]
-    public void Create_ReturnsExpected_WhenOfficeValid(CreateOfficeDto createOfficeDto)
+    [Test, TestCaseSource(typeof(TestCaseSources), nameof(TestCaseSources.CreateOfficeTestCasesInvalid))]
+    public void Create_Throws_WhenOfficeInvalid(CreateOfficeDto createOfficeDto)
     {
         // Assert
         Assert.ThrowsAsync<ValidationException>(async () => await _officeService.CreateOffice(createOfficeDto));

@@ -43,7 +43,8 @@ namespace OfficesController
 
             var app = builder.Build();
 
-            await DbInitializer.EnsureCreated("Offices", "Offices");
+            if (Environment.GetEnvironmentVariable("ENVIRONMENT") != "TEST")
+                DbInitializer.EnsureCreated("Offices", "Offices");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

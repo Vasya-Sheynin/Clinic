@@ -17,4 +17,17 @@ public class Office
 
     [Required]
     public bool IsActive { get; set; }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is Office o)
+        {
+            return PhotoId == o.PhotoId &&
+                Address == o.Address &&
+                RegistryPhoneNumber == o.RegistryPhoneNumber &&
+                IsActive == o.IsActive;
+        }
+
+        return false;
+    }
 }
