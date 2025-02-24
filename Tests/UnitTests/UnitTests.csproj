@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Offices\Application\Application.csproj" />
+    <ProjectReference Include="..\..\Offices\OfficesController\OfficesController.csproj" />
   </ItemGroup>
 
   <ItemGroup>

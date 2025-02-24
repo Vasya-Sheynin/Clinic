@@ -1,19 +1,19 @@
 ﻿using Application.Dto;
 using Application.Mapper;
 using AutoMapper;
-using IntegrationTests.Util;
+using IntegrationTests.OfficeTests.Util;
 using Moq;
 using Newtonsoft.Json;
 using Offices;
 using System.Net;
 using System.Text;
 
-namespace IntegrationTests;
+namespace IntegrationTests.OfficeTests;
 
 [TestFixture]
 public class Tests
 {
-    private OfficeWebApplicationFactory _factory; 
+    private OfficeWebApplicationFactory _factory;
     private HttpClient _client;
     private IEnumerable<OfficeDto> _offices;
     private IMapper _mapper;
@@ -156,8 +156,8 @@ public class Tests
         // Arrange
         var url = $"api/office/{id}";
         var requestBody = new StringContent(
-            JsonConvert.SerializeObject(updateOfficeDto), 
-            Encoding.UTF8, 
+            JsonConvert.SerializeObject(updateOfficeDto),
+            Encoding.UTF8,
             "application/json"
             );
         var actualOffice = _offices.FirstOrDefault(x => x.Id == id);

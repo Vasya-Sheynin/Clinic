@@ -12,7 +12,7 @@ using OfficeRepositories;
 using Offices;
 using System;
 
-namespace UnitTests;
+namespace UnitTests.OfficeTests;
 
 [TestFixture]
 public class OfficeServiceTests

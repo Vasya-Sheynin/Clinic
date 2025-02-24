@@ -20,7 +20,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 
-namespace IntegrationTests.Util;
+namespace IntegrationTests.OfficeTests.Util;
 
 internal class OfficeWebApplicationFactory : WebApplicationFactory<Program>
 {

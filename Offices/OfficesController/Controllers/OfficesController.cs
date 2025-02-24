@@ -19,7 +19,7 @@ public class OfficesController : ControllerBase
 
     [Authorize(Roles = "Receptionist")]
     [HttpGet("{id}")]
-    public async Task<ActionResult<Office>> GetOffice([FromRoute] Guid id)
+    public async Task<ActionResult<OfficeDto>> GetOffice([FromRoute] Guid id)
     {
         var office = await _officeService.GetOffice(id);
 
@@ -28,7 +28,7 @@ public class OfficesController : ControllerBase
 
     [Authorize(Roles = "Receptionist")]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Office>>> GetOffices()
+    public async Task<ActionResult<IEnumerable<OfficeDto>>> GetOffices()
     {
         var offices = await _officeService.GetOffices();
 

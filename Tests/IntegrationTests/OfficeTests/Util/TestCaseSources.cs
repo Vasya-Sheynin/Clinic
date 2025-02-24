@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IntegrationTests.Util;
+namespace IntegrationTests.OfficeTests.Util;
 
 public class TestCaseSources
 {
