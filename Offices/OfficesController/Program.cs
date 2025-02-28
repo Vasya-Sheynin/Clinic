@@ -1,6 +1,7 @@
 using Application;
 using Application.Dto;
 using Application.Mapper;
+using Application.Services;
 using Application.Validators;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
@@ -34,6 +35,7 @@ namespace OfficesController
 
             builder.Services.AddScoped<IOfficeRepository, OfficeRepository>();
             builder.Services.AddScoped<IOfficeService, OfficeService>();
+            builder.Services.AddScoped<ICachingService, CachingService>();
 
             builder.Services.AddExceptionHandling(builder.Environment);
 
@@ -41,7 +43,8 @@ namespace OfficesController
 
             var app = builder.Build();
 
-            await DbInitializer.EnsureCreated("Offices", "Offices");
+            if (Environment.GetEnvironmentVariable("ENVIRONMENT") != "TEST")
+                DbInitializer.EnsureCreated("Offices", "Offices");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
